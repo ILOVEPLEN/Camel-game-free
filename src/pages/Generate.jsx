@@ -7,19 +7,27 @@ const DAYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'
 const DAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 export function generateRoutine(profile) {
-  const { goals = [], timePerDay = 45, skillLevel = 'Intermediate', gymAccess = false, ageGroup = '', gameDays = [] } = profile;
+  const { goals = [], timePerDay = 45, skillLevel = 'Intermediate', gymAccess = false, ageGroup = '', gameDays = [], position = 'any', equipment = [] } = profile;
 
   const diffMap = { Beginner: 0, Intermediate: 1, Advanced: 2 };
   const levelNum = diffMap[skillLevel] ?? 1;
   const ageMaxLevel = ageGroup === 'u12' ? 0 : ageGroup === '13-15' ? 1 : 2;
-  const effectiveLevel = Math.min(levelNum, ageMaxLevel);
+  const effectiveLevel = Math.min(levelNum, ageMaxLevel === 0 ? 0 : ageMaxLevel);
 
   const drillCount = timePerDay <= 30 ? 5 : timePerDay <= 60 ? 8 : 10;
-  const exCount = timePerDay <= 30 ? 4 : timePerDay <= 60 ? 6 : 8;
+  const exCount    = timePerDay <= 30 ? 4 : timePerDay <= 60 ? 6 : 8;
   const gameDayKeys = new Set(gameDays.map(d => d.toLowerCase()));
 
   const fd = (cat, n) => drills
-    .filter(d => (!cat || d.category === cat) && (diffMap[d.difficulty] ?? 1) <= effectiveLevel + 1)
+    .filter(d => {
+      if (cat && d.category !== cat) return false;
+      if ((diffMap[d.difficulty] ?? 1) > effectiveLevel + 1) return false;
+      if (d.equipment && d.equipment.length > 0 && equipment.length > 0) {
+        const needed = d.equipment.filter(e => e !== 'Basketball');
+        if (needed.length > 0 && !needed.every(e => equipment.includes(e))) return false;
+      }
+      return true;
+    })
     .sort(() => Math.random() - 0.5).slice(0, n).map(d => d.name);
 
   const fe = (grp, n) => exercises
@@ -28,6 +36,16 @@ export function generateRoutine(profile) {
 
   const estDur = Math.min(timePerDay, drillCount * 7);
   const mk = (type, name, focus, items, dur) => ({ type, name, focus, duration: dur ?? timePerDay, items });
+
+  const posMap = {
+    PG:  { primary: 'Ball Handling', secondary: 'Shooting',      tertiary: 'Passing' },
+    SG:  { primary: 'Shooting',      secondary: 'Ball Handling', tertiary: 'Finishing' },
+    SF:  { primary: 'Shooting',      secondary: 'Finishing',     tertiary: 'Ball Handling' },
+    PF:  { primary: 'Finishing',     secondary: 'Defense',       tertiary: 'Conditioning' },
+    C:   { primary: 'Finishing',     secondary: 'Defense',       tertiary: 'Footwork' },
+    any: { primary: 'Shooting',      secondary: 'Ball Handling', tertiary: 'Finishing' },
+  };
+  const pos = posMap[position] || posMap.any;
   const third = Math.ceil(drillCount / 3);
 
   const shootingSession  = mk('drill', 'Shooting Session',      'Shooting',      fd('Shooting', drillCount),      estDur);
@@ -35,14 +53,16 @@ export function generateRoutine(profile) {
   const defenseSession   = mk('drill', 'Defense Session',       'Defense',       fd('Defense', drillCount),       estDur);
   const finishingSession = mk('drill', 'Finishing Session',     'Finishing',     fd('Finishing', drillCount),     estDur);
   const conditionSession = mk('drill', 'Conditioning Session',  'Conditioning',  fd('Conditioning', drillCount),  estDur);
-  const fullSession      = mk('drill', 'Full Skill Session',    'All Skills',    [...fd('Shooting', third), ...fd('Ball Handling', third), ...fd('Finishing', third)], estDur);
+  const passingSession   = mk('drill', 'Passing Session',       'Passing',       fd('Passing', drillCount),       estDur);
+  const footworkSession  = mk('drill', 'Footwork Session',      'Footwork',      fd('Footwork', drillCount),      estDur);
+  const posSession       = mk('drill', `${pos.primary} Focus`,  pos.primary,     [...fd(pos.primary, third + 1), ...fd(pos.secondary, third), ...fd(pos.tertiary, third - 1)], estDur);
 
-  const upperGym = mk('gym', 'Upper Body',  'Chest/Back/Shoulders', [...fe('Chest', Math.ceil(exCount*0.3)), ...fe('Back', Math.ceil(exCount*0.4)), ...fe('Shoulders', Math.floor(exCount*0.3))]);
-  const lowerGym = mk('gym', 'Lower Body',  'Legs/Core',            [...fe('Legs', Math.ceil(exCount*0.6)), ...fe('Core', Math.floor(exCount*0.4))]);
-  const fullGym  = mk('gym', 'Full Body',   'Full Body',            [...fe('Chest',2), ...fe('Back',2), ...fe('Legs',2), ...fe('Core',2)]);
+  const upperGym = mk('gym', 'Upper Body', 'Chest/Back/Shoulders', [...fe('Chest', Math.ceil(exCount*0.3)), ...fe('Back', Math.ceil(exCount*0.4)), ...fe('Shoulders', Math.floor(exCount*0.3))]);
+  const lowerGym = mk('gym', 'Lower Body', 'Legs/Core',            [...fe('Legs', Math.ceil(exCount*0.6)), ...fe('Core', Math.floor(exCount*0.4))]);
+  const fullGym  = mk('gym', 'Full Body',  'Full Body',            [...fe('Chest',2), ...fe('Back',2), ...fe('Legs',2), ...fe('Core',2)]);
 
-  const gameDay = mk('rest', 'Game Day',  'Compete & Rest', ['Light warmup only (5 min)', 'Dynamic stretches', 'No heavy training — save legs for the game', '🏀 Play your best!'], 15);
-  const rest    = mk('rest', 'Rest Day',  'Recovery',       ['Light stretching (optional)', 'Foam roll', 'Stay hydrated', 'Sleep 8+ hours'], 0);
+  const gameDay = mk('rest', 'Game Day',  'Compete & Rest', ['Light warmup only (5 min)', 'Dynamic stretches — no static holds', 'Short shooting warm-up (5 min catch & shoot)', '🏀 Save your legs for the game!'], 15);
+  const rest    = mk('rest', 'Rest Day',  'Recovery',       ['Light stretching or yoga (10 min)', 'Foam roll quads, calves, hamstrings', 'Watch film — study your opponents', 'Sleep 8+ hours — this is when you grow'], 0);
 
   const hasShooting = goals.includes('shooting');
   const hasHandles  = goals.includes('handles');
@@ -54,33 +74,21 @@ export function generateRoutine(profile) {
   let schedule = {};
 
   if (hasStrength && gymAccess) {
-    schedule = {
-      monday:    hasShooting ? shootingSession  : fullSession,
-      tuesday:   upperGym,
-      wednesday: hasHandles  ? handlesSession   : fullSession,
-      thursday:  lowerGym,
-      friday:    hasDefense  ? defenseSession   : finishingSession,
-      saturday:  hasSpeed    ? conditionSession : fullGym,
-      sunday:    rest,
-    };
+    schedule = { monday: posSession, tuesday: upperGym, wednesday: handlesSession, thursday: lowerGym, friday: hasDefense ? defenseSession : finishingSession, saturday: hasSpeed ? conditionSession : shootingSession, sunday: rest };
+  } else if (position === 'PG') {
+    schedule = { monday: handlesSession, tuesday: passingSession, wednesday: shootingSession, thursday: rest, friday: conditionSession, saturday: posSession, sunday: rest };
+  } else if (position === 'C' || position === 'PF') {
+    schedule = { monday: finishingSession, tuesday: footworkSession, wednesday: defenseSession, thursday: rest, friday: conditionSession, saturday: posSession, sunday: rest };
   } else if (hasSpeed) {
-    schedule = {
-      monday:    hasShooting ? shootingSession : fullSession,
-      tuesday:   conditionSession,
-      wednesday: hasHandles  ? handlesSession  : fullSession,
-      thursday:  rest,
-      friday:    hasDefense  ? defenseSession  : finishingSession,
-      saturday:  conditionSession,
-      sunday:    rest,
-    };
+    schedule = { monday: posSession, tuesday: conditionSession, wednesday: handlesSession, thursday: rest, friday: hasDefense ? defenseSession : finishingSession, saturday: conditionSession, sunday: rest };
   } else {
     schedule = {
-      monday:    hasShooting || allAround ? shootingSession  : fullSession,
+      monday:    hasShooting || allAround ? shootingSession  : posSession,
       tuesday:   rest,
-      wednesday: hasHandles  || allAround ? handlesSession   : fullSession,
-      thursday:  hasDefense  || allAround ? defenseSession   : rest,
+      wednesday: hasHandles  || allAround ? handlesSession   : posSession,
+      thursday:  hasDefense  || allAround ? defenseSession   : footworkSession,
       friday:    finishingSession,
-      saturday:  hasSpeed    ? conditionSession : fullSession,
+      saturday:  posSession,
       sunday:    rest,
     };
   }
@@ -90,6 +98,31 @@ export function generateRoutine(profile) {
   }
 
   return schedule;
+}
+
+export function shuffleDayDrills(dayWorkout, profile) {
+  if (dayWorkout.type !== 'drill') return dayWorkout;
+  const { timePerDay = 45, skillLevel = 'Intermediate', ageGroup = '', equipment = [] } = profile;
+  const diffMap = { Beginner: 0, Intermediate: 1, Advanced: 2 };
+  const levelNum = diffMap[skillLevel] ?? 1;
+  const ageMaxLevel = ageGroup === 'u12' ? 0 : ageGroup === '13-15' ? 1 : 2;
+  const effectiveLevel = Math.min(levelNum, ageMaxLevel === 0 ? 0 : ageMaxLevel);
+  const drillCount = timePerDay <= 30 ? 5 : timePerDay <= 60 ? 8 : 10;
+  const category = ['All Skills', 'Ball Handling Focus', 'Shooting Focus', 'Finishing Focus'].includes(dayWorkout.focus) ? null : dayWorkout.focus;
+
+  const newItems = drills
+    .filter(d => {
+      if (category && d.category !== category) return false;
+      if ((diffMap[d.difficulty] ?? 1) > effectiveLevel + 1) return false;
+      if (d.equipment && d.equipment.length > 0 && equipment.length > 0) {
+        const needed = d.equipment.filter(e => e !== 'Basketball');
+        if (needed.length > 0 && !needed.every(e => equipment.includes(e))) return false;
+      }
+      return true;
+    })
+    .sort(() => Math.random() - 0.5).slice(0, drillCount).map(d => d.name);
+
+  return { ...dayWorkout, items: newItems };
 }
 
 const GOAL_OPTIONS = [
@@ -103,25 +136,37 @@ const GOAL_OPTIONS = [
 
 export default function Generate() {
   const { state, setRoutine } = useApp();
-  const [goals, setGoals] = useState(state.profile?.goals || []);
-  const [time, setTime] = useState(state.profile?.timePerDay || 45);
-  const [level, setLevel] = useState(state.profile?.skillLevel || 'Intermediate');
-  const [gym, setGym] = useState(state.profile?.gymAccess || false);
+  const profile = state.profile || {};
+  const [goals, setGoals] = useState(profile.goals || []);
+  const [time, setTime] = useState(profile.timePerDay || 45);
+  const [level, setLevel] = useState(profile.skillLevel || 'Intermediate');
   const [generated, setGenerated] = useState(state.routine || null);
   const [generating, setGenerating] = useState(false);
 
-  const toggleGoal = (id) => {
-    setGoals(prev => prev.includes(id) ? prev.filter(g => g !== id) : [...prev, id]);
-  };
+  const toggleGoal = (id) => setGoals(prev => prev.includes(id) ? prev.filter(g => g !== id) : [...prev, id]);
 
   const handleGenerate = () => {
     setGenerating(true);
     setTimeout(() => {
-      const routine = generateRoutine({ goals, timePerDay: time, skillLevel: level, gymAccess: gym });
+      const routine = generateRoutine({ ...profile, goals, timePerDay: time, skillLevel: level });
       setGenerated(routine);
       setRoutine(routine);
       setGenerating(false);
     }, 1200);
+  };
+
+  const handleShuffle = (day) => {
+    if (!generated) return;
+    const updated = { ...generated, [day]: shuffleDayDrills(generated[day], { ...profile, timePerDay: time, skillLevel: level }) };
+    setGenerated(updated);
+    setRoutine(updated);
+  };
+
+  const handleSwapDays = (dayA, dayB) => {
+    if (!generated) return;
+    const updated = { ...generated, [dayA]: generated[dayB], [dayB]: generated[dayA] };
+    setGenerated(updated);
+    setRoutine(updated);
   };
 
   return (
@@ -202,7 +247,7 @@ export default function Generate() {
           )}
         </button>
 
-        {generated && <RoutineDisplay routine={generated} />}
+        {generated && <RoutineDisplay routine={generated} onShuffle={handleShuffle} onSwap={handleSwapDays} />}
       </div>
     </div>
   );
@@ -211,12 +256,16 @@ export default function Generate() {
 const DAY_COLORS = { drill: '#0EA5E9', gym: '#7C3AED', rest: '#94A3B8' };
 const DAY_BG = { drill: '#EBF5FF', gym: '#F5F3FF', rest: '#F8FAFC' };
 
-function RoutineDisplay({ routine }) {
+function RoutineDisplay({ routine, onShuffle, onSwap }) {
   const [expanded, setExpanded] = useState(null);
+  const [swapping, setSwapping] = useState(null);
 
   return (
     <div className="fade-in">
-      <h3 className="section-title">Your Weekly Plan</h3>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+        <h3 className="section-title" style={{ margin: 0 }}>Your Weekly Plan</h3>
+        {swapping && <span style={{ fontSize: '12px', color: '#0EA5E9', fontWeight: '600' }}>Tap a day to swap with {DAY_LABELS[DAYS.indexOf(swapping)]}</span>}
+      </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
         {DAYS.map((day, i) => {
           const workout = routine[day];
@@ -224,24 +273,40 @@ function RoutineDisplay({ routine }) {
           const color = DAY_COLORS[workout.type];
           const bg = DAY_BG[workout.type];
           const isOpen = expanded === day;
+          const isSwapSource = swapping === day;
           return (
-            <div key={day} style={{ borderRadius: '14px', overflow: 'hidden', border: `1.5px solid ${color}22` }}>
-              <button onClick={() => setExpanded(isOpen ? null : day)} style={{
-                width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                padding: '14px 16px', background: isOpen ? bg : '#fff', cursor: 'pointer', border: 'none',
-                transition: 'background 0.15s',
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <span style={{ width: '40px', height: '40px', borderRadius: '10px', background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px' }}>
-                    {workout.type === 'gym' ? '🏋️' : workout.type === 'rest' ? '😴' : '🏀'}
-                  </span>
-                  <div style={{ textAlign: 'left' }}>
-                    <div style={{ fontWeight: '700', fontSize: '15px', color: '#0F172A' }}>{DAY_LABELS[i]} — {workout.name}</div>
-                    <div style={{ fontSize: '12px', color: '#94A3B8' }}>{workout.focus} {workout.duration > 0 ? `· ${workout.duration} min` : ''}</div>
+            <div key={day} style={{ borderRadius: '14px', overflow: 'hidden', border: `1.5px solid ${isSwapSource ? '#0EA5E9' : color + '22'}`, transition: 'border 0.2s' }}>
+              <div style={{ display: 'flex', alignItems: 'stretch' }}>
+                <button onClick={() => {
+                  if (swapping && swapping !== day) { onSwap(swapping, day); setSwapping(null); }
+                  else setExpanded(isOpen ? null : day);
+                }} style={{
+                  flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                  padding: '14px 16px', background: isOpen ? bg : '#fff', cursor: 'pointer', border: 'none',
+                  transition: 'background 0.15s', textAlign: 'left',
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <span style={{ width: '40px', height: '40px', borderRadius: '10px', background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px' }}>
+                      {workout.type === 'gym' ? '🏋️' : workout.type === 'rest' ? '😴' : '🏀'}
+                    </span>
+                    <div>
+                      <div style={{ fontWeight: '700', fontSize: '15px', color: '#0F172A' }}>{DAY_LABELS[i]} — {workout.name}</div>
+                      <div style={{ fontSize: '12px', color: '#94A3B8' }}>{workout.focus} {workout.duration > 0 ? `· ${workout.duration} min` : ''}</div>
+                    </div>
                   </div>
+                  <span style={{ color: '#CBD5E1', fontSize: '18px', transform: isOpen ? 'rotate(90deg)' : 'none', transition: 'transform 0.2s' }}>›</span>
+                </button>
+                <div style={{ display: 'flex', flexDirection: 'column', borderLeft: '1px solid #F1F5F9' }}>
+                  {workout.type === 'drill' && (
+                    <button onClick={() => onShuffle(day)} title="Shuffle drills" style={{
+                      flex: 1, padding: '0 12px', background: 'none', border: 'none', cursor: 'pointer', fontSize: '16px', color: '#94A3B8',
+                    }}>🔀</button>
+                  )}
+                  <button onClick={() => setSwapping(isSwapSource ? null : day)} title="Swap this day" style={{
+                    flex: 1, padding: '0 12px', background: isSwapSource ? '#EBF5FF' : 'none', border: 'none', cursor: 'pointer', fontSize: '14px', color: isSwapSource ? '#0EA5E9' : '#94A3B8',
+                  }}>⇄</button>
                 </div>
-                <span style={{ color: '#CBD5E1', fontSize: '18px', transform: isOpen ? 'rotate(90deg)' : 'none', transition: 'transform 0.2s' }}>›</span>
-              </button>
+              </div>
               {isOpen && workout.items && (
                 <div style={{ background: bg, padding: '0 16px 14px' }}>
                   {workout.items.map((item, idx) => (

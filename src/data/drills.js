@@ -1,4 +1,4 @@
-export const DRILL_CATEGORIES = ['All', 'Shooting', 'Ball Handling', 'Defense', 'Finishing', 'Conditioning'];
+export const DRILL_CATEGORIES = ['All', 'Shooting', 'Ball Handling', 'Defense', 'Finishing', 'Conditioning', 'Passing', 'Footwork'];
 
 export const drills = [
   // ── SHOOTING ──────────────────────────────────────────────
@@ -225,6 +225,114 @@ export const drills = [
     ],
     tips: 'The goal is to shoot the same way when tired as when fresh.'
   },
+  {
+    id: 'd45',
+    name: 'Pull-Up 3-Pointer',
+    category: 'Shooting',
+    duration: 8,
+    difficulty: 'Intermediate',
+    equipment: ['Basketball', 'Hoop'],
+    description: 'Dribble into a 3-point pull-up from both wings, stop on a dime, rise and shoot.',
+    instructions: [
+      'Start at the top of the key with the ball in your hands',
+      'Attack the right wing with two hard dribbles, building speed',
+      'Plant your inside foot and execute a clean one-two hop stop at the 3-point line',
+      'Rise straight up — do not lean forward or backward — and shoot with a full follow-through',
+      'Retrieve your make or miss, dribble back, and repeat from the left wing',
+      'Complete 5 reps from each wing per round, 3 rounds total'
+    ],
+    tips: 'The stop is the hardest part. If your momentum carries you forward, you will fade off balance. Practice the stop alone before adding the shot.'
+  },
+  {
+    id: 'd46',
+    name: 'Catch & Shoot off V-Cut',
+    category: 'Shooting',
+    duration: 7,
+    difficulty: 'Intermediate',
+    equipment: ['Basketball', 'Hoop'],
+    description: 'Simulate receiving a pass off a V-cut, catch in shooting stance and fire.',
+    instructions: [
+      'Start at the 3-point line on the wing, walk your defender down toward the block',
+      'Plant hard on your inside foot and push off explosively back up toward the 3-point line',
+      'Toss the ball ahead of yourself or have a partner chest-pass to you as you arrive',
+      'Catch the ball already in your shooting stance — feet under you, knees slightly bent',
+      'Shoot immediately without an extra dribble or reset',
+      'Complete 6 reps on each wing, 3 rounds total'
+    ],
+    tips: 'The catch is everything — if you are not ready to shoot the moment the ball arrives, the defender recovers. Train your feet to arrive before the ball does.'
+  },
+  {
+    id: 'd47',
+    name: 'Fadeaway Jumper',
+    category: 'Shooting',
+    duration: 8,
+    difficulty: 'Advanced',
+    equipment: ['Basketball', 'Hoop'],
+    description: 'Elbow fadeaway from both sides, step back, maintain balance in the air.',
+    instructions: [
+      'Position yourself at the right elbow, ball in your shooting pocket',
+      'Take one hard jab step toward the baseline to create space',
+      'Simultaneously push off your lead foot and fade slightly away from the basket',
+      'Keep your shooting elbow in, release at the top of your jump while drifting — not falling — backward',
+      'Hold your follow-through until the ball hits the net or rim',
+      'Perform 5 reps from the right elbow, 5 from the left, 3 rounds'
+    ],
+    tips: 'A true fadeaway means controlled drift, not a wild lean. Your torso should be upright at release — only your feet move away from the defender.'
+  },
+  {
+    id: 'd48',
+    name: 'Free Throw Make-5 Challenge',
+    category: 'Shooting',
+    duration: 8,
+    difficulty: 'Beginner',
+    equipment: ['Basketball', 'Hoop'],
+    description: 'Must make 5 in a row before moving on, 4 rounds total.',
+    instructions: [
+      'Stand at the free throw line and go through your full pre-shot routine on every single attempt',
+      'Shoot until you make 5 consecutive free throws — the streak resets on any miss',
+      'After completing a streak of 5, step away from the line for 30 seconds to simulate game pressure',
+      'Return and start a new streak — complete 4 total streaks of 5',
+      'Track how many total shots it takes you to complete all 4 rounds',
+      'Goal: complete all 4 rounds in 25 total attempts or fewer'
+    ],
+    tips: 'Missing during a streak teaches you to refocus under pressure. Breathe, reset your routine, and trust your mechanics — do not rush the next shot after a miss.'
+  },
+  {
+    id: 'd49',
+    name: 'Off-Screen Shooting',
+    category: 'Shooting',
+    duration: 7,
+    difficulty: 'Intermediate',
+    equipment: ['Basketball', 'Hoop'],
+    description: 'Simulate curling off a screen to catch and shoot, use chair or cone as screen.',
+    instructions: [
+      'Place a chair or tall cone at the elbow to serve as the screener',
+      'Start at the block and cut toward the chair as if running off a screen',
+      'Read the angle: curl tightly around the chair for a catch-and-shoot on the move',
+      'Toss the ball ahead or have a partner deliver a pass as you clear the screen',
+      'Catch in shooting stance, shoot in rhythm without resetting your feet',
+      'Perform 5 curl-and-shoot reps, then 5 fade-away reps (brush the screen and fade to the corner), 3 rounds total'
+    ],
+    tips: 'Use your shoulder to brush the screener — wide cuts give the defender time to recover. The tighter you run off the screen, the better your shot.'
+  },
+  {
+    id: 'd50',
+    name: 'Step-Back Jumper',
+    category: 'Shooting',
+    duration: 8,
+    difficulty: 'Advanced',
+    equipment: ['Basketball', 'Hoop'],
+    description: 'One hard dribble step-back to create space then shoot, both sides.',
+    instructions: [
+      'Position yourself on the right wing at the 3-point line in triple-threat stance',
+      'Take one hard attacking dribble toward the basket to engage the imaginary defender',
+      'Plant your inside foot and push off explosively backward and slightly sideways to create separation',
+      'Land with both feet simultaneously in a balanced shooting stance behind the 3-point line',
+      'Rise and shoot immediately — hesitation gives the defender time to close out',
+      'Complete 5 reps from the right wing, 5 from the left wing, 3 rounds total'
+    ],
+    tips: 'The step-back only works if the first dribble is hard enough to make the defender commit. A soft attack dribble telegraphs the move — make them believe you are going to the rim.'
+  },
 
   // ── BALL HANDLING ─────────────────────────────────────────
   {
@@ -401,6 +509,96 @@ export const drills = [
     ],
     tips: 'Most players have a massive gap between hands. Close it here.'
   },
+  {
+    id: 'd51',
+    name: 'Behind the Back Series',
+    category: 'Ball Handling',
+    duration: 7,
+    difficulty: 'Intermediate',
+    equipment: ['Basketball'],
+    description: 'Stationary BtB, walking BtB, full court BtB combo.',
+    instructions: [
+      'Start stationary: pound the ball 3 times right, then swing it behind your back to your left hand and pound 3 times — repeat continuously for 60 seconds',
+      'Progress to walking: dribble right hand, behind the back at each step so left hand receives it naturally in stride',
+      'Walk the full court length twice using only behind-the-back transfers',
+      'Now add a crossover in front, then a behind-the-back as a combo — alternate every 4 steps full court',
+      'Finish with a speed run: dribble at 70% speed, adding a BtB move every 5 steps',
+      'Complete 3 full-court trips in the combo sequence, rest 30 seconds between trips'
+    ],
+    tips: 'The behind-the-back is not a fancy move — it is a protection move. Use it when a defender is swiping at the ball from the front. Keep your elbow close to your hip to get the cleanest wrap.'
+  },
+  {
+    id: 'd52',
+    name: 'Hesi (Hesitation) Dribble',
+    category: 'Ball Handling',
+    duration: 8,
+    difficulty: 'Intermediate',
+    equipment: ['Basketball', 'Cones'],
+    description: 'Slow dribble then explosive burst past a cone, simulate freezing a defender.',
+    instructions: [
+      'Place 4 cones in a straight line from the half court to the basket, spacing them 8-10 feet apart',
+      'Dribble toward the first cone at a slow, casual pace as if you have nowhere to go',
+      'As you approach within 2 feet of the cone, suddenly go upright — straighten your body briefly to sell the hesitation',
+      'Then immediately drop back into an attack stance and explode past the cone at full speed',
+      'Slow back down before the next cone and repeat the hesitation move',
+      'Complete 5 trips from half court to the basket, then 5 more leading with the opposite hand'
+    ],
+    tips: 'The hesitation works because defenders match your pace — when you slow down, they relax, and that is the moment you blow by them. The key is a genuine pause, not a fake one. Make them think you are stopping.'
+  },
+  {
+    id: 'd53',
+    name: 'Full Court Weak Hand Only',
+    category: 'Ball Handling',
+    duration: 8,
+    difficulty: 'Beginner',
+    equipment: ['Basketball', 'Hoop'],
+    description: 'Everything with the weak hand: dribble full court, layup, come back.',
+    instructions: [
+      'Place your strong hand behind your back or tuck it in your waistband to eliminate the temptation to use it',
+      'Speed dribble full court using only your weak hand — stay in control, do not just push the ball ahead',
+      'Approach the basket and finish with a weak-hand layup off the correct foot',
+      'Retrieve the ball out of the net and dribble back to the baseline using only your weak hand',
+      'Add a weak-hand crossover between the legs or a hesitation move on each return trip',
+      'Complete 8 full-court round trips, resting 20 seconds between every 2 trips'
+    ],
+    tips: 'This will feel uncomfortable and slow. That is the point. Your weak hand only becomes capable through overloaded, intentional reps. Resist the urge to switch hands even once.'
+  },
+  {
+    id: 'd54',
+    name: 'Combo Move Series',
+    category: 'Ball Handling',
+    duration: 8,
+    difficulty: 'Advanced',
+    equipment: ['Basketball'],
+    description: 'Crossover-between-behind in sequence, both directions, add speed each round.',
+    instructions: [
+      'Start stationary: crossover right to left, between the legs left to right, behind the back right to left — this is one combo',
+      'Repeat the three-move combo continuously for 45 seconds, staying low and controlled',
+      'Walk forward while performing the combo sequence — do not pause between moves',
+      'Progress to a jog, then a near-full-speed dribble while maintaining the sequence',
+      'Reverse the sequence: behind the back first, between the legs second, crossover third',
+      'Complete 4 rounds of 45 seconds each, increasing speed with every round and resting 15 seconds between rounds'
+    ],
+    tips: 'Combo moves in a game flow naturally only when each individual move is automatic. If you have to think about the behind-the-back, slow down. Drill the weakest link of the combo separately until it is automatic, then reintegrate it into the sequence.'
+  },
+  {
+    id: 'd55',
+    name: 'In & Out Dribble',
+    category: 'Ball Handling',
+    duration: 6,
+    difficulty: 'Beginner',
+    equipment: ['Basketball'],
+    description: 'Fake to one side then explode the other way, great for breaking ankles.',
+    instructions: [
+      'Dribble the ball with your right hand and take an exaggerated step to your left — sell the direction change with your shoulder and head',
+      'Instead of crossing the ball, push it back to the outside on the same right hand and explode right',
+      'Practice the move slowly first: step left, push out right, burst right, repeat 10 times',
+      'Now walk the length of the court performing an in-and-out every 4-5 steps',
+      'Progress to game speed: dribble with purpose, sell the fake aggressively, explode past the imaginary defender',
+      'Complete 4 full court trips with the right hand, then 4 with the left hand'
+    ],
+    tips: 'The in-and-out is your first move when you want to attack without crossing the ball. The sell is in the head and shoulder fake — if you look where you are going, the defender will not bite.'
+  },
 
   // ── DEFENSE ───────────────────────────────────────────────
   {
@@ -505,6 +703,78 @@ export const drills = [
       '3 sets of 5 on each side'
     ],
     tips: 'Front the post on weak side, 3/4 deny on strong side. Be physical.'
+  },
+  {
+    id: 'd56',
+    name: 'Charge Taking Drill',
+    category: 'Defense',
+    duration: 6,
+    difficulty: 'Intermediate',
+    equipment: [],
+    description: 'Position yourself to take a charge, practice falling correctly and protecting yourself.',
+    instructions: [
+      'Stand just outside the restricted arc in the lane — this is the legal charge zone, inside the arc is always a block',
+      'Get your feet set before the imaginary or real offensive player arrives — both feet planted, body square to the offense',
+      'Bend your knees slightly and put your arms across your chest to protect yourself on contact',
+      'When contact comes, absorb it by sitting back slightly and falling straight down, not backward onto your tailbone',
+      'Hit the ground with your forearms first to break the fall, chin tucked, then show the referee your position by keeping your arms in',
+      'Practice the fall technique without a partner 10 times, then have a partner walk into you at slow speed for 10 more controlled reps'
+    ],
+    tips: 'Taking a charge is a skill and a mindset. Most players flinch or jump — you have to stay planted. The refs are looking for two things: feet set before contact and no lateral movement. Give them both.'
+  },
+  {
+    id: 'd57',
+    name: 'Deny the Ball',
+    category: 'Defense',
+    duration: 7,
+    difficulty: 'Intermediate',
+    equipment: [],
+    description: 'Deny pass to the wing, one hand in passing lane, stay between ball and man.',
+    instructions: [
+      'Set up in a denial position on the wing: one foot in the passing lane, lead hand extended palm up to intercept passes',
+      'Your body should be half-turned, able to see both the ball and your man at the same time — use your peripheral vision',
+      'Stay on the balls of your feet in a low, active stance — never flat-footed',
+      'When your man cuts toward the ball, slide and maintain denial without reaching or grabbing',
+      'If the ball is passed to your man despite denial, immediately sprint to get in front of them — no ball watching',
+      'Hold denial position for 30-second rounds, 6 rounds each side, with a partner moving the offensive player around'
+    ],
+    tips: 'Denial defense is exhausting because you cannot relax for a single second. Your positioning must be perfect before the pass is thrown, not after. One step out of position is all a good player needs.'
+  },
+  {
+    id: 'd58',
+    name: 'Contest Without Fouling',
+    category: 'Defense',
+    duration: 6,
+    difficulty: 'Beginner',
+    equipment: ['Basketball', 'Hoop'],
+    description: 'Practice jumping straight up to contest, not into the shooter.',
+    instructions: [
+      'Stand at the 3-point line in defensive stance, with a partner or mannequin at the same spot in shooting position',
+      'When the shooter begins their shooting motion, jump straight up — your body should go vertically, not forward',
+      'Keep both arms extended straight above your head — do not swipe or reach toward the ball',
+      'Land in the same spot you left — if you land forward or into the shooter, that is a foul',
+      'Practice the straight-up contest 10 times from the 3-point line, then 10 times from the mid-range',
+      'Add a partner who actually shoots so you practice timing the contest with a real release'
+    ],
+    tips: 'The most common defensive foul is jumping forward into the shooter. Gravity is your friend — jump up and let gravity bring you straight down. Your hands being up matters more than being close to the shooter.'
+  },
+  {
+    id: 'd59',
+    name: 'Help-Side Rotation',
+    category: 'Defense',
+    duration: 7,
+    difficulty: 'Intermediate',
+    equipment: [],
+    description: 'Rotate from help position to ball, two steps off your man, ready to help.',
+    instructions: [
+      'Start in the help-side lane: your man is one pass away, you are in the lane positioned to see both ball and man simultaneously',
+      'Position yourself two big steps off your man — close enough to recover if they get the ball, but in position to stop a drive',
+      'When the ball-handler drives toward the lane, take one hard step toward the ball to show help and stop the drive',
+      'If the ball-handler kicks it out to your man, sprint back out to close out with a high hand and chopped steps',
+      'Practice the rotation sequence — help position, step toward drive, sprint back to your man — 10 reps at walk-through speed first',
+      'Increase to full speed for 3 sets of 8 rotations, switching which side you help from each set'
+    ],
+    tips: 'Help-side defense wins championships. The mistake most players make is watching the ball instead of staying connected to their man. Your job is to stop the drive AND recover to your man if they kick it out — both, every time.'
   },
 
   // ── FINISHING ─────────────────────────────────────────────
@@ -627,6 +897,96 @@ export const drills = [
       'Make 20 from each side'
     ],
     tips: 'Lay the ball UP, not at the backboard. Imagine laying it on a shelf.'
+  },
+  {
+    id: 'd60',
+    name: 'Baby Hook',
+    category: 'Finishing',
+    duration: 6,
+    difficulty: 'Intermediate',
+    equipment: ['Basketball', 'Hoop'],
+    description: 'Soft one-hand hook from close range, both sides, use backboard.',
+    instructions: [
+      'Stand at the low block on the right side of the lane, 3-5 feet from the basket',
+      'Hold the ball in your right hand with your arm extended, elbow slightly bent — hook position',
+      'Step across your body with your left foot to create separation from the imaginary defender',
+      'Sweep the ball in a hook arc from low to high, releasing off your fingertips at the top of the arc — aim for the near corner of the backboard box',
+      'The motion is a soft, high-arcing release — not a push — use touch, not force',
+      'Complete 10 reps from the right block with the right hand, then 10 from the left block with the left hand, 3 rounds total'
+    ],
+    tips: 'The baby hook is the one unstoppable shot in basketball when it is developed — defenders cannot block it without fouling you. The key is keeping it close to your body until the very last second, then sweeping up and away.'
+  },
+  {
+    id: 'd61',
+    name: 'Up and Under',
+    category: 'Finishing',
+    duration: 7,
+    difficulty: 'Intermediate',
+    equipment: ['Basketball', 'Hoop'],
+    description: 'Pump fake to get defender in air, step through and finish.',
+    instructions: [
+      'Receive the ball in the post or at the elbow and face the basket in a strong triple-threat position',
+      'Give a convincing shot fake — raise the ball toward your shooting pocket and dip your knees as if actually shooting',
+      'Pause one beat to let the imaginary defender commit and leave their feet',
+      'Step through with your non-pivot foot under the defender who is now in the air',
+      'Finish with a soft layup or short shot on the other side of the defender, using the opposite hand from your step-through direction',
+      'Complete 5 reps stepping through right, 5 stepping through left, 3 rounds total'
+    ],
+    tips: 'The pump fake only works if it looks exactly like your real shot. Use the same grip, same lift, same body position. A lazy pump fake will not get anyone off their feet.'
+  },
+  {
+    id: 'd62',
+    name: 'Contact Finish',
+    category: 'Finishing',
+    duration: 8,
+    difficulty: 'Advanced',
+    equipment: ['Basketball', 'Hoop'],
+    description: 'Drive and finish through simulated contact, stay strong and convert.',
+    instructions: [
+      'Set up a pad, foam roller, or have a partner use a blocking pad at the lane line to simulate a body at the rim',
+      'Drive hard from the wing, gathering the ball before contact',
+      'Absorb the contact by keeping your core tight, staying tall through the hit, and maintaining your finishing motion',
+      'Finish with your inside hand, keeping the ball high and protected through the contact',
+      'The goal is not to avoid contact but to convert through it — keep shooting after the hit',
+      'Complete 5 drives from the right wing and 5 from the left wing, resting 30 seconds between rounds, 3 rounds total'
+    ],
+    tips: 'Flinching at contact is a natural reaction that must be trained out. Start with very light contact and build up. The players who score through contact do so because they have taken that contact a thousand times in practice and learned to treat it as normal.'
+  },
+  {
+    id: 'd63',
+    name: 'Post Drop Step',
+    category: 'Finishing',
+    duration: 8,
+    difficulty: 'Intermediate',
+    equipment: ['Basketball', 'Hoop'],
+    description: 'Receive in the post, drop step baseline and middle, both sides.',
+    instructions: [
+      'Establish deep post position on the right block, calling for the ball with a target hand',
+      'Receive the pass and immediately feel where your imaginary defender is with your back — this is your read',
+      'For the baseline drop step: take your left foot and swing it around toward the baseline, sealing the defender behind you, then power up for a layup or short shot',
+      'For the middle drop step: take your left foot and swing it toward the middle of the lane, sealing off the defender, then finish with a power move to the rim',
+      'Practice 5 baseline drop steps, then 5 middle drop steps from the right block',
+      'Move to the left block and repeat with the opposite foot as the pivot, 3 full rounds total'
+    ],
+    tips: 'The drop step is all about leverage, not speed. Feel the defender and go the opposite direction. If they are playing your baseline, go middle. If they play middle, go baseline. The read happens before you catch the ball.'
+  },
+  {
+    id: 'd64',
+    name: 'Lefty Layup Focus',
+    category: 'Finishing',
+    duration: 6,
+    difficulty: 'Beginner',
+    equipment: ['Basketball', 'Hoop'],
+    description: 'Left hand only layups from both sides, overload the weak hand.',
+    instructions: [
+      'Start at the right wing, dribble to the basket and finish with a left-hand layup — yes, the left hand from the right side',
+      'Gather off your right foot and extend the left hand toward the backboard, aiming for the near corner of the painted box',
+      'Move to the left side and again finish with the left hand — this is the natural layup side for the left hand, so practice getting comfortable here too',
+      'Perform 10 left-hand layups from the right side (the harder side), then 10 from the left side',
+      'Add a jab step or hesitation before each drive to simulate creating space before attacking',
+      'Complete 4 rounds total, focusing on soft touch and using the backboard consistently'
+    ],
+    tips: 'Most right-handed players avoid left-hand finishes because they are uncomfortable. Defenders know this and will funnel you left to force the weak hand. Train the left hand until it is not weak anymore.'
   },
 
   // ── CONDITIONING ──────────────────────────────────────────
@@ -770,5 +1130,333 @@ export const drills = [
       'Complete 8 reps'
     ],
     tips: 'Keep your stance low the entire time. Rising up = losing your man.'
+  },
+  {
+    id: 'd65',
+    name: 'Lateral Bounds',
+    category: 'Conditioning',
+    duration: 6,
+    difficulty: 'Intermediate',
+    equipment: [],
+    description: 'Single-leg lateral jumps, stick the landing, build explosiveness side to side.',
+    instructions: [
+      'Stand on your right foot with a slight knee bend, loading your hip and glute',
+      'Explode laterally off your right foot as far as you can to the left, driving through your hip and swinging your arms for momentum',
+      'Land on your left foot only, absorbing the landing with a soft knee bend — hold the landing for one full second before going again',
+      'Immediately bound back to the right, exploding off the left foot',
+      'Complete 10 bounds in each direction as one set, focusing on maximum distance and clean single-leg landings',
+      'Rest 45 seconds between sets, complete 4 sets total'
+    ],
+    tips: 'The one-second hold on landing is not optional — it teaches your body to stabilize and builds the ankle and knee strength that prevents injuries on cuts and landings in games.'
+  },
+  {
+    id: 'd66',
+    name: 'Jump Squat Series',
+    category: 'Conditioning',
+    duration: 6,
+    difficulty: 'Beginner',
+    equipment: [],
+    description: 'Bodyweight jump squats, explode up, soft landing, 3 sets 15 reps.',
+    instructions: [
+      'Stand with feet shoulder-width apart, toes slightly turned out, core braced',
+      'Drop into a squat until your thighs are parallel to the floor — do not let your knees cave inward',
+      'From the bottom position, explode upward as fast as possible, driving through your heels and extending through your hips, knees, and ankles',
+      'Leave the ground and reach full extension, then land softly with bent knees on the balls of your feet to absorb impact',
+      'Immediately reload into the squat position and go again without pausing at the top',
+      'Complete 3 sets of 15 reps with 45 seconds rest between sets'
+    ],
+    tips: 'The quality of each jump matters more than the speed of the reps. A sloppy landing is how ankles and knees get hurt. Land like you are trying not to make any noise.'
+  },
+  {
+    id: 'd67',
+    name: 'Half-Court Shuttle',
+    category: 'Conditioning',
+    duration: 6,
+    difficulty: 'Intermediate',
+    equipment: [],
+    description: 'Baseline to half court and back, touch the line, 10 reps 45s rest.',
+    instructions: [
+      'Start on the baseline in a sprint stance, weight forward on the balls of your feet',
+      'On go, sprint at full speed to the half-court line',
+      'Touch the line with your hand — not just your foot — then immediately reverse direction',
+      'Sprint back to the baseline at full speed and touch that line with your hand',
+      'This counts as one rep — complete 10 total reps without stopping',
+      'Rest exactly 45 seconds, then complete 3 more sets of 10 reps'
+    ],
+    tips: 'The difference between good and great conditioning is what you do in the last 3 reps of each set. Anyone can sprint the first 7. Push your effort when it gets hard — that is where the conditioning gains are made.'
+  },
+  {
+    id: 'd68',
+    name: 'Timed Layup Challenge',
+    category: 'Conditioning',
+    duration: 8,
+    difficulty: 'Beginner',
+    equipment: ['Basketball', 'Hoop'],
+    description: 'Make as many layups as possible in 4 minutes, alternate hands.',
+    instructions: [
+      'Start a 4-minute timer and begin at the right side of the basket',
+      'Attack the right side and finish with your right hand, immediately retrieve the ball out of the net',
+      'Dribble quickly to the left side and finish with your left hand — alternate sides on every single layup',
+      'Do not waste time — every second counts, so move with urgency between each layup',
+      'Keep a running count of every made layup — misses do not count',
+      'Record your total makes and try to beat your score each session'
+    ],
+    tips: 'The first 2 minutes feel easy. Push through the last 2 when your legs get heavy. Track your score every session — improvement from 30 to 45 layups in 4 minutes represents a real jump in both conditioning and finishing efficiency.'
+  },
+
+  // ── PASSING ───────────────────────────────────────────────
+  {
+    id: 'd69',
+    name: 'Wall Pass Drill',
+    category: 'Passing',
+    duration: 6,
+    difficulty: 'Beginner',
+    equipment: [],
+    description: 'Chest passes against a wall, 50 reps, then bounce passes 50 reps, quick release.',
+    instructions: [
+      'Stand 6-8 feet from a solid wall, feet shoulder-width apart in a balanced athletic stance',
+      'Grip the ball with both hands on the sides, thumbs pointing toward each other behind the ball',
+      'Chest pass: push the ball from your chest with both hands, stepping forward with one foot, ending with thumbs pointing down and fingers spread toward the target — the pass should be firm and flat, not arcing',
+      'Catch the return off the wall and immediately reset — minimize the time the ball is in your hands before releasing again',
+      'Complete 50 chest passes, then switch to bounce passes: aim for a spot on the floor 2/3 of the way to the wall so the ball bounces up to waist height on the return',
+      'Complete 50 bounce passes, focusing on the same quick release and step through'
+    ],
+    tips: 'A soft pass is a turnover waiting to happen. Passes should have zip on them — make a sound when they hit the wall. The step through transfers your body weight into the pass and adds velocity without arm strain.'
+  },
+  {
+    id: 'd70',
+    name: 'Bounce Pass Accuracy',
+    category: 'Passing',
+    duration: 6,
+    difficulty: 'Beginner',
+    equipment: ['Basketball'],
+    description: 'Hit a target on the floor with bounce pass, land it 2/3 of the way to target.',
+    instructions: [
+      'Place a piece of tape or mark a spot on the floor to serve as your target — position yourself 10 feet away from a partner or wall',
+      'The target should be placed at exactly 2/3 of the distance between you and the receiver — this is where the ball should hit the floor',
+      'Grip the ball on the sides and step through as you release, aiming to hit your floor target precisely',
+      'A well-thrown bounce pass hits the target and arrives at the receiver between the waist and knee — adjust your aim until the bounce hits that height consistently',
+      'Complete 20 reps standing still, then move to 20 reps where you are catching and immediately bounce-passing on the move',
+      'Track how many of your 20 moving passes hit within one foot of your target'
+    ],
+    tips: 'Bounce passes are slower in the air than chest passes but harder to steal — they are best used in traffic. The common mistake is bouncing too close to yourself, which makes the ball rise too high at the receiver. Aim further out than feels natural.'
+  },
+  {
+    id: 'd71',
+    name: 'Overhead Pass',
+    category: 'Passing',
+    duration: 5,
+    difficulty: 'Beginner',
+    equipment: ['Basketball'],
+    description: 'Two-hand overhead pass to wall or partner, 40 reps, strong core.',
+    instructions: [
+      'Hold the ball directly above your head with both hands, elbows slightly bent — the ball should be behind your forehead, not in front of your face',
+      'Engage your core and snap the ball forward by extending your elbows and flicking your wrists downward at release',
+      'The ball should travel on a line — not a rainbow arc — and arrive at chest height to the target',
+      'Step into the pass to generate power from your lower body, not just your arms',
+      'Complete 40 reps against a wall or with a partner, focusing on a consistent flat trajectory and strong wrist snap at release',
+      'After 40 stationary reps, add 10 reps where you jump slightly before releasing — this is the overhead outlet pass after a rebound'
+    ],
+    tips: 'The overhead pass is used to skip over pressing defenders, to outlet quickly after a rebound, and to enter the ball into the post. If your pass is arcing too high, your elbows are bending too far back — shorten the windup.'
+  },
+  {
+    id: 'd72',
+    name: 'Skip Pass Drill',
+    category: 'Passing',
+    duration: 7,
+    difficulty: 'Intermediate',
+    equipment: ['Basketball'],
+    description: 'Swing ball side to side with skip passes, catch in shooting stance.',
+    instructions: [
+      'Position yourself at the top of the key — imagine a teammate in each corner and another at the opposite wing',
+      'Start with the ball on the right side, wind up with both hands and throw a long, flat skip pass to the left corner — the ball should travel diagonally across the court',
+      'The receiver (or your target) should catch the ball at shooting height so it can be released immediately',
+      'After throwing, immediately shift your weight and prepare to receive a return pass',
+      'Practice throwing skip passes from the right wing to the left corner, from the left wing to the right corner, and from the top to each corner — 10 reps from each angle',
+      'Focus on catching every return pass already in shooting stance — feet set, ball in pocket, ready to shoot'
+    ],
+    tips: 'The skip pass is one of the most important passes in modern basketball — it swings the ball from one side to the other to find the open corner shooter. Throw it flat and crisp. A slow, looping skip pass gives the defense time to rotate and close out.'
+  },
+  {
+    id: 'd73',
+    name: 'Drive & Kick Simulation',
+    category: 'Passing',
+    duration: 8,
+    difficulty: 'Intermediate',
+    equipment: ['Basketball', 'Hoop'],
+    description: 'Drive the lane, kick to corner for a shot, simulate spot-up shooting off drive.',
+    instructions: [
+      'Start at the top of the key in triple-threat position',
+      'Attack the lane hard as if driving to score — sell the drive, make the defense collapse',
+      'When you reach the lane line, pick up your dribble and pivot to face the corner',
+      'Deliver a crisp chest or bounce pass to the corner target (partner, cone, or spot on the floor)',
+      'Sprint to the corner yourself, catch the imaginary return pass, and shoot — simulate the spot-up shot that results from the drive-and-kick',
+      'Complete 5 reps driving right and kicking left, 5 reps driving left and kicking right, 3 rounds total'
+    ],
+    tips: 'The kick pass needs to arrive at the shooter while they are still in rhythm — a pass that bounces at their feet or arrives late kills the advantage your drive created. Practice delivering the pass on a rope, not a rainbow.'
+  },
+  {
+    id: 'd74',
+    name: 'No-Look Pass Practice',
+    category: 'Passing',
+    duration: 7,
+    difficulty: 'Advanced',
+    equipment: ['Basketball'],
+    description: 'Face a target, look away and throw accurate passes, develops court vision.',
+    instructions: [
+      'Stand 8-10 feet from a wall target or partner, facing slightly away from your target so you must pass without direct eye contact',
+      'Pick a fixed point elsewhere to stare at — a spot on the opposite wall, a cone, anything — and commit to not looking at your target',
+      'Deliver a chest pass to the target using only your peripheral vision and spatial memory',
+      'Vary the types of no-look passes: chest, bounce, and wrap-around passes where you look one direction and pass another',
+      'With a partner, look directly at them while passing to a second target behind them — simulate looking off a defender',
+      'Complete 40 total no-look pass reps across the variations, resting when needed'
+    ],
+    tips: 'No-look passing is about peripheral vision and court awareness, not tricks. The best passers in basketball are always scanning the floor — by the time they receive the ball, they already know where the open man is. Practice seeing the whole floor before you touch the ball.'
+  },
+  {
+    id: 'd75',
+    name: 'Outlet Pass Drill',
+    category: 'Passing',
+    duration: 6,
+    difficulty: 'Intermediate',
+    equipment: ['Basketball', 'Hoop'],
+    description: 'Grab a rebound, pivot quickly, throw long outlet pass and sprint.',
+    instructions: [
+      'Start under the basket — toss the ball high off the backboard to simulate a missed shot',
+      'Jump and catch the ball at the highest point with two hands, immediately bringing it to your chin (chinning the ball) to protect it from imaginary defenders',
+      'Pivot explosively on your inside foot to face the sideline — do not pivot toward the middle of the court',
+      'Scan the floor quickly and deliver a long, flat overhead or one-handed outlet pass toward the sideline at the nearest free throw line extended',
+      'Immediately sprint up the floor after throwing the pass — in transition, passers must become runners',
+      'Complete 10 outlet passes to the right sideline, 10 to the left sideline, 2 rounds total'
+    ],
+    tips: 'The outlet pass starts a fast break. Speed of release is everything — every half-second you hold the ball after the rebound gives the defense time to get back. Catch, pivot, and throw as one continuous motion.'
+  },
+  {
+    id: 'd76',
+    name: 'Quick Release Passing',
+    category: 'Passing',
+    duration: 7,
+    difficulty: 'Intermediate',
+    equipment: ['Basketball'],
+    description: 'Rapid-fire passes against wall, minimize time ball is in your hands.',
+    instructions: [
+      'Stand 5-6 feet from the wall — closer than usual to reduce flight time and force faster hands',
+      'Chest pass against the wall and catch the return — your goal is to release the next pass within one second of catching the previous one',
+      'Do not set your feet between passes — catch and release from wherever your hands are, simulating passing on the move',
+      'After 30 reps, switch to rapid-fire bounce passes at the same distance',
+      'After 30 bounce pass reps, combine both: alternate chest and bounce passes on every other rep for 30 more reps',
+      'Complete 3 full rounds, resting 20 seconds between rounds'
+    ],
+    tips: 'In a game, every extra second you hold the ball is a second for the defense to recover. The goal of this drill is to make your catch-and-release feel reflexive. Count your seconds aloud at first — most beginners hold the ball 2-3 seconds without realizing it.'
+  },
+
+  // ── FOOTWORK ──────────────────────────────────────────────
+  {
+    id: 'd77',
+    name: 'Pivot Work',
+    category: 'Footwork',
+    duration: 6,
+    difficulty: 'Beginner',
+    equipment: [],
+    description: 'Front pivot and reverse pivot from both feet, 100 reps, don\'t lift the pivot foot.',
+    instructions: [
+      'Stand with feet shoulder-width apart and designate your right foot as the pivot foot — this foot cannot move once it is established',
+      'Front pivot: swing your left foot forward and around in a sweeping motion, rotating your entire body to face the opposite direction while your right foot stays planted',
+      'Reverse pivot: swing your left foot backward and around to face the opposite direction — this is the pivot you use to protect the ball and create space',
+      'Perform 25 front pivots on the right foot, then 25 reverse pivots on the right foot',
+      'Switch to the left foot as your pivot foot and complete 25 front pivots and 25 reverse pivots',
+      'Focus entirely on keeping the pivot foot stationary — any drag or lift is a travel'
+    ],
+    tips: 'Pivoting is the most commonly traveled move in basketball, especially at the youth level. Film yourself if possible — players almost always drag the pivot foot slightly without realizing it. The pivot foot stays nailed to the floor, even the heel.'
+  },
+  {
+    id: 'd78',
+    name: 'Triple Threat Position',
+    category: 'Footwork',
+    duration: 6,
+    difficulty: 'Beginner',
+    equipment: ['Basketball'],
+    description: 'Hold ball in triple threat, practice jab steps and shot fakes from the position.',
+    instructions: [
+      'Receive or pick up the ball and immediately get into triple threat: knees bent, weight on balls of feet, ball in your shooting pocket at hip level on your shooting side, eyes up',
+      'Hold this position for 5 seconds — feel how balanced and explosive you are from this stance',
+      'Execute a jab step: take a short, hard step with your non-pivot foot to one side without lifting your pivot foot, then return to triple threat',
+      'Execute a shot fake: raise the ball toward your shoulder as if shooting, watching for the imaginary defender to jump, then bring the ball back down to triple threat',
+      'Alternate jab steps and shot fakes for 2 minutes, then combine them: jab step right, shot fake, jab step left',
+      'Complete 3 two-minute rounds with 30 seconds rest between rounds'
+    ],
+    tips: 'Triple threat is the most powerful position in basketball — you can shoot, pass, or drive from it. Every time you catch the ball in a game, your first move should be getting into triple threat. Players who skip this step give away their intentions immediately.'
+  },
+  {
+    id: 'd79',
+    name: 'Jab Step Series',
+    category: 'Footwork',
+    duration: 7,
+    difficulty: 'Intermediate',
+    equipment: ['Basketball'],
+    description: 'Jab right then go, jab then shoot, jab then crossover, master all three reads.',
+    instructions: [
+      'Start in triple threat position on the right wing with your left foot as the pivot foot',
+      'Read 1 — Jab and go: take a short hard jab step right, and if the defender steps back, immediately attack right by driving hard off the jab foot in that same direction',
+      'Read 2 — Jab and shoot: take the jab step right, and if the defender steps up to stop the drive, bring the jab foot back and shoot the jumper — they are off balance from reacting to the jab',
+      'Read 3 — Jab and crossover: take the jab step right, and if the defender shifts to cut off the right drive, crossover dribble hard to the left and attack that side',
+      'Practice each read 10 times individually so the footwork is automatic, then randomize the reads',
+      'Complete 3 full sets from both the right and left wing, always starting from a proper triple threat position'
+    ],
+    tips: 'The jab step only works if it is convincing — a tiny jab does nothing. Step hard enough that a real defender has to react. Then read their response and take what they give you. The three reads are not choices you make — the defender makes them for you.'
+  },
+  {
+    id: 'd80',
+    name: 'V-Cut Footwork',
+    category: 'Footwork',
+    duration: 6,
+    difficulty: 'Beginner',
+    equipment: [],
+    description: 'Cut hard in one direction, plant hard, push off and cut back the other way to get open.',
+    instructions: [
+      'Start at the 3-point line on the wing — walk your defender down toward the block by taking slow, deliberate steps toward the baseline',
+      'When you are 3-4 steps below the 3-point line, plant your inside foot hard into the ground — this plant must be aggressive, not gradual',
+      'Push off explosively off the planted foot, changing direction back up toward the 3-point line at a sharp angle',
+      'The cut back to the 3-point line should be at maximum speed — this is when you are open, so sprint to the catch point',
+      'As you arrive at the 3-point line, get your hands up as a target and be ready to catch in shooting stance',
+      'Complete 15 V-cuts on each side of the floor, 2 rounds total'
+    ],
+    tips: 'The V-cut gets you open by making the defender think you are going one way before exploding the other. The plant is everything — a soft plant means a slow cut, and a slow cut means the defender stays attached. Sell the wrong direction before the plant, then explode.'
+  },
+  {
+    id: 'd81',
+    name: 'L-Cut Footwork',
+    category: 'Footwork',
+    duration: 6,
+    difficulty: 'Intermediate',
+    equipment: [],
+    description: 'Baseline cut then 90-degree turn to the wing, simulate getting open off a curl.',
+    instructions: [
+      'Start at the block — cut hard along the baseline toward the corner as if clearing out or drawing a defender',
+      'After 4-5 hard steps along the baseline, plant your outside foot and make a sharp 90-degree cut up toward the wing at the 3-point line — this creates the L shape',
+      'The baseline portion of the cut is designed to pull the defender one direction before the turn, so run it with purpose — do not jog it',
+      'As you turn the corner and cut to the wing, get your hands up and be ready to receive the ball immediately at the 3-point line in shooting stance',
+      'Practice the cut 10 times on the right side, then 10 times on the left side',
+      'Add a ball toss or partner pass at the end of each cut so you practice actually catching and shooting off the footwork'
+    ],
+    tips: 'The L-cut is used by forwards and wings to get open on the weak side when the ball is on the opposite wing. The key is not rounding the corner — make a clean 90-degree turn. Rounding the corner gives your defender time to recover.'
+  },
+  {
+    id: 'd82',
+    name: 'Post Entry Footwork',
+    category: 'Footwork',
+    duration: 7,
+    difficulty: 'Intermediate',
+    equipment: ['Basketball', 'Hoop'],
+    description: 'Seal defender on entry, catch, pivot to face up or go to the block.',
+    instructions: [
+      'Establish position on the block by stepping in front of your imaginary defender with your inside foot, using your body to seal them behind you — your back should be to the basket and to the defender',
+      'Call for the ball with your top hand as a target while using your bottom arm and body to maintain the seal',
+      'Receive the entry pass with two hands and immediately chin the ball — bring it tight to your body at chin height with elbows out to protect it',
+      'Read 1 — Face up: catch and pivot on your inside foot to face the basket, reading whether to shoot a face-up jumper or drive',
+      'Read 2 — Go to block: catch and execute a drop step, swinging your outside foot toward the baseline or middle to seal the defender and attack the rim directly',
+      'Practice 5 face-up reads and 5 drop-step reads from each block, 3 rounds total'
+    ],
+    tips: 'The entry catch is where most post players get stripped — they catch the ball away from their body and give the defender an angle to poke it out. Catch with two hands, chin it immediately, and use your elbows to create space before making your move.'
   },
 ];

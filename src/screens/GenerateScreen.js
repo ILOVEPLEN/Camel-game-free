@@ -20,18 +20,26 @@ const GOAL_OPTIONS = [
 ];
 
 export function generateRoutine(profile) {
-  const { goals = [], timePerDay = 45, skillLevel = 'Intermediate', gymAccess = false, ageGroup = '', gameDays = [] } = profile;
+  const { goals = [], timePerDay = 45, skillLevel = 'Intermediate', gymAccess = false, ageGroup = '', gameDays = [], position = 'any', equipment = [] } = profile;
   const diffMap = { Beginner: 0, Intermediate: 1, Advanced: 2 };
   const levelNum = diffMap[skillLevel] ?? 1;
   const ageMaxLevel = ageGroup === 'u12' ? 0 : ageGroup === '13-15' ? 1 : 2;
-  const effectiveLevel = Math.min(levelNum, ageMaxLevel);
+  const effectiveLevel = Math.min(levelNum, ageMaxLevel === 0 ? 0 : ageMaxLevel);
 
   const drillCount = timePerDay <= 30 ? 5 : timePerDay <= 60 ? 8 : 10;
   const exCount = timePerDay <= 30 ? 4 : timePerDay <= 60 ? 6 : 8;
   const gameDayKeys = new Set(gameDays.map(d => d.toLowerCase()));
 
   const fd = (cat, n) => drills
-    .filter(d => (!cat || d.category === cat) && (diffMap[d.difficulty] ?? 1) <= effectiveLevel + 1)
+    .filter(d => {
+      if (cat && d.category !== cat) return false;
+      if ((diffMap[d.difficulty] ?? 1) > effectiveLevel + 1) return false;
+      if (d.equipment && d.equipment.length > 0 && equipment.length > 0) {
+        const needed = d.equipment.filter(e => e !== 'Basketball');
+        if (needed.length > 0 && !needed.every(e => equipment.includes(e))) return false;
+      }
+      return true;
+    })
     .sort(() => Math.random() - 0.5).slice(0, n).map(d => d.name);
 
   const fe = (grp, n) => exercises
@@ -40,6 +48,15 @@ export function generateRoutine(profile) {
 
   const estDur = Math.min(timePerDay, drillCount * 7);
   const mk = (type, name, focus, items, dur) => ({ type, name, focus, duration: dur ?? timePerDay, items });
+  const posMap = {
+    PG:  { primary: 'Ball Handling', secondary: 'Shooting',      tertiary: 'Passing' },
+    SG:  { primary: 'Shooting',      secondary: 'Ball Handling', tertiary: 'Finishing' },
+    SF:  { primary: 'Shooting',      secondary: 'Finishing',     tertiary: 'Ball Handling' },
+    PF:  { primary: 'Finishing',     secondary: 'Defense',       tertiary: 'Conditioning' },
+    C:   { primary: 'Finishing',     secondary: 'Defense',       tertiary: 'Footwork' },
+    any: { primary: 'Shooting',      secondary: 'Ball Handling', tertiary: 'Finishing' },
+  };
+  const pos = posMap[position] || posMap.any;
   const third = Math.ceil(drillCount / 3);
 
   const shootingSession  = mk('drill', 'Shooting Session',      'Shooting',      fd('Shooting', drillCount),      estDur);
@@ -47,14 +64,16 @@ export function generateRoutine(profile) {
   const defenseSession   = mk('drill', 'Defense Session',       'Defense',       fd('Defense', drillCount),       estDur);
   const finishingSession = mk('drill', 'Finishing Session',     'Finishing',     fd('Finishing', drillCount),     estDur);
   const conditionSession = mk('drill', 'Conditioning Session',  'Conditioning',  fd('Conditioning', drillCount),  estDur);
-  const fullSession      = mk('drill', 'Full Skill Session',    'All Skills',    [...fd('Shooting', third), ...fd('Ball Handling', third), ...fd('Finishing', third)], estDur);
+  const passingSession   = mk('drill', 'Passing Session',       'Passing',       fd('Passing', drillCount),       estDur);
+  const footworkSession  = mk('drill', 'Footwork Session',      'Footwork',      fd('Footwork', drillCount),      estDur);
+  const posSession       = mk('drill', `${pos.primary} Focus`,  pos.primary,     [...fd(pos.primary, third + 1), ...fd(pos.secondary, third), ...fd(pos.tertiary, third - 1)], estDur);
 
   const upperGym = mk('gym', 'Upper Body', 'Chest/Back/Shoulders', [...fe('Chest', Math.ceil(exCount*0.3)), ...fe('Back', Math.ceil(exCount*0.4)), ...fe('Shoulders', Math.floor(exCount*0.3))]);
   const lowerGym = mk('gym', 'Lower Body', 'Legs/Core',            [...fe('Legs', Math.ceil(exCount*0.6)), ...fe('Core', Math.floor(exCount*0.4))]);
   const fullGym  = mk('gym', 'Full Body',  'Full Body',            [...fe('Chest',2), ...fe('Back',2), ...fe('Legs',2), ...fe('Core',2)]);
 
-  const gameDay = mk('rest', 'Game Day', 'Compete & Rest', ['Light warmup only (5 min)', 'Dynamic stretches', 'No heavy training — save legs for the game', '🏀 Play your best!'], 15);
-  const rest    = mk('rest', 'Rest Day', 'Recovery',       ['Light stretching (optional)', 'Foam roll', 'Stay hydrated', 'Sleep 8+ hours'], 0);
+  const gameDay = mk('rest', 'Game Day', 'Compete & Rest', ['Light warmup only (5 min)', 'Dynamic stretches — no static holds', 'Short shooting warm-up (5 min catch & shoot)', '🏀 Save your legs for the game!'], 15);
+  const rest    = mk('rest', 'Rest Day', 'Recovery',       ['Light stretching or yoga (10 min)', 'Foam roll quads, calves, hamstrings', 'Watch film — study your opponents', 'Sleep 8+ hours — this is when you grow'], 0);
 
   const hasShooting = goals.includes('shooting');
   const hasHandles  = goals.includes('handles');
@@ -66,33 +85,21 @@ export function generateRoutine(profile) {
   let schedule = {};
 
   if (hasStrength && gymAccess) {
-    schedule = {
-      monday:    hasShooting ? shootingSession  : fullSession,
-      tuesday:   upperGym,
-      wednesday: hasHandles  ? handlesSession   : fullSession,
-      thursday:  lowerGym,
-      friday:    hasDefense  ? defenseSession   : finishingSession,
-      saturday:  hasSpeed    ? conditionSession : fullGym,
-      sunday:    rest,
-    };
+    schedule = { monday: posSession, tuesday: upperGym, wednesday: handlesSession, thursday: lowerGym, friday: hasDefense ? defenseSession : finishingSession, saturday: hasSpeed ? conditionSession : shootingSession, sunday: rest };
+  } else if (position === 'PG') {
+    schedule = { monday: handlesSession, tuesday: passingSession, wednesday: shootingSession, thursday: rest, friday: conditionSession, saturday: posSession, sunday: rest };
+  } else if (position === 'C' || position === 'PF') {
+    schedule = { monday: finishingSession, tuesday: footworkSession, wednesday: defenseSession, thursday: rest, friday: conditionSession, saturday: posSession, sunday: rest };
   } else if (hasSpeed) {
-    schedule = {
-      monday:    hasShooting ? shootingSession : fullSession,
-      tuesday:   conditionSession,
-      wednesday: hasHandles  ? handlesSession  : fullSession,
-      thursday:  rest,
-      friday:    hasDefense  ? defenseSession  : finishingSession,
-      saturday:  conditionSession,
-      sunday:    rest,
-    };
+    schedule = { monday: posSession, tuesday: conditionSession, wednesday: handlesSession, thursday: rest, friday: hasDefense ? defenseSession : finishingSession, saturday: conditionSession, sunday: rest };
   } else {
     schedule = {
-      monday:    hasShooting || allAround ? shootingSession  : fullSession,
+      monday:    hasShooting || allAround ? shootingSession  : posSession,
       tuesday:   rest,
-      wednesday: hasHandles  || allAround ? handlesSession   : fullSession,
-      thursday:  hasDefense  || allAround ? defenseSession   : rest,
+      wednesday: hasHandles  || allAround ? handlesSession   : posSession,
+      thursday:  hasDefense  || allAround ? defenseSession   : footworkSession,
       friday:    finishingSession,
-      saturday:  hasSpeed    ? conditionSession : fullSession,
+      saturday:  posSession,
       sunday:    rest,
     };
   }
