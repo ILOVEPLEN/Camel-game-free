@@ -14,16 +14,8 @@ export default defineConfig({
       workbox: {
         skipWaiting: true,
         clientsClaim: true,
-        runtimeCaching: [
-          {
-            urlPattern: /\/Camel-game-free\/.*/,
-            handler: 'NetworkFirst',
-            options: {
-              cacheName: 'app-v2',
-              networkTimeoutSeconds: 5,
-            },
-          },
-        ],
+        globPatterns: [],
+        runtimeCaching: [],
       },
       manifest: {
         name: 'Project Ball',
