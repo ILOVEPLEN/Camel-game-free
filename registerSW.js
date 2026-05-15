@@ -1,0 +1,1 @@
+if('serviceWorker' in navigator) {window.addEventListener('load', () => {navigator.serviceWorker.register('/Camel-game-free/sw.js', { scope: '/Camel-game-free/' })})}
