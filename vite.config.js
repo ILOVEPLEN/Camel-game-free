@@ -3,6 +3,10 @@ import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig({
+  base: '/Camel-game-free/',
+  resolve: {
+    extensions: ['.mjs', '.jsx', '.tsx', '.ts', '.js', '.json'],
+  },
   plugins: [
     react(),
     VitePWA({
