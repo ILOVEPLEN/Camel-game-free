@@ -7,91 +7,86 @@ const DAYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'
 const DAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 export function generateRoutine(profile) {
-  const { goals = [], timePerDay = 45, skillLevel = 'Intermediate', gymAccess = false } = profile;
+  const { goals = [], timePerDay = 45, skillLevel = 'Intermediate', gymAccess = false, ageGroup = '', gameDays = [] } = profile;
 
   const diffMap = { Beginner: 0, Intermediate: 1, Advanced: 2 };
   const levelNum = diffMap[skillLevel] ?? 1;
+  const ageMaxLevel = ageGroup === 'u12' ? 0 : ageGroup === '13-15' ? 1 : 2;
+  const effectiveLevel = Math.min(levelNum, ageMaxLevel);
 
-  const filterDrills = (category, count) => {
-    return drills
-      .filter(d => {
-        if (category && d.category !== category) return false;
-        const dLevel = diffMap[d.difficulty] ?? 1;
-        return dLevel <= levelNum + 1;
-      })
-      .sort(() => Math.random() - 0.5)
-      .slice(0, count)
-      .map(d => d.name);
-  };
+  const drillCount = timePerDay <= 30 ? 5 : timePerDay <= 60 ? 8 : 10;
+  const exCount = timePerDay <= 30 ? 4 : timePerDay <= 60 ? 6 : 8;
+  const gameDayKeys = new Set(gameDays.map(d => d.toLowerCase()));
 
-  const filterExercises = (group, count) => {
-    return exercises
-      .filter(e => {
-        if (group && e.muscleGroup !== group) return false;
-        if (!gymAccess && ['Barbell', 'Cable Machine'].includes(e.equipment)) return false;
-        const eLevel = diffMap[e.difficulty] ?? 1;
-        return eLevel <= levelNum + 1;
-      })
-      .sort(() => Math.random() - 0.5)
-      .slice(0, count)
-      .map(e => `${e.name} — ${e.sets}×${e.reps}`);
-  };
+  const fd = (cat, n) => drills
+    .filter(d => (!cat || d.category === cat) && (diffMap[d.difficulty] ?? 1) <= effectiveLevel + 1)
+    .sort(() => Math.random() - 0.5).slice(0, n).map(d => d.name);
+
+  const fe = (grp, n) => exercises
+    .filter(e => (!grp || e.muscleGroup === grp) && !(!gymAccess && ['Barbell','Cable Machine'].includes(e.equipment)) && (diffMap[e.difficulty] ?? 1) <= effectiveLevel + 1)
+    .sort(() => Math.random() - 0.5).slice(0, n).map(e => `${e.name} — ${e.sets}×${e.reps}`);
+
+  const estDur = Math.min(timePerDay, drillCount * 7);
+  const mk = (type, name, focus, items, dur) => ({ type, name, focus, duration: dur ?? timePerDay, items });
+  const third = Math.ceil(drillCount / 3);
+
+  const shootingSession  = mk('drill', 'Shooting Session',      'Shooting',      fd('Shooting', drillCount),      estDur);
+  const handlesSession   = mk('drill', 'Ball Handling Session', 'Ball Handling', fd('Ball Handling', drillCount), estDur);
+  const defenseSession   = mk('drill', 'Defense Session',       'Defense',       fd('Defense', drillCount),       estDur);
+  const finishingSession = mk('drill', 'Finishing Session',     'Finishing',     fd('Finishing', drillCount),     estDur);
+  const conditionSession = mk('drill', 'Conditioning Session',  'Conditioning',  fd('Conditioning', drillCount),  estDur);
+  const fullSession      = mk('drill', 'Full Skill Session',    'All Skills',    [...fd('Shooting', third), ...fd('Ball Handling', third), ...fd('Finishing', third)], estDur);
+
+  const upperGym = mk('gym', 'Upper Body',  'Chest/Back/Shoulders', [...fe('Chest', Math.ceil(exCount*0.3)), ...fe('Back', Math.ceil(exCount*0.4)), ...fe('Shoulders', Math.floor(exCount*0.3))]);
+  const lowerGym = mk('gym', 'Lower Body',  'Legs/Core',            [...fe('Legs', Math.ceil(exCount*0.6)), ...fe('Core', Math.floor(exCount*0.4))]);
+  const fullGym  = mk('gym', 'Full Body',   'Full Body',            [...fe('Chest',2), ...fe('Back',2), ...fe('Legs',2), ...fe('Core',2)]);
+
+  const gameDay = mk('rest', 'Game Day',  'Compete & Rest', ['Light warmup only (5 min)', 'Dynamic stretches', 'No heavy training — save legs for the game', '🏀 Play your best!'], 15);
+  const rest    = mk('rest', 'Rest Day',  'Recovery',       ['Light stretching (optional)', 'Foam roll', 'Stay hydrated', 'Sleep 8+ hours'], 0);
 
   const hasShooting = goals.includes('shooting');
-  const hasHandles = goals.includes('handles');
+  const hasHandles  = goals.includes('handles');
   const hasStrength = goals.includes('strength');
-  const hasSpeed = goals.includes('speed');
-  const hasDefense = goals.includes('defense');
-  const allAround = goals.includes('allaround') || goals.length === 0;
-
-  const shortTime = timePerDay <= 30;
-  const drillCount = shortTime ? 2 : 3;
-  const exCount = shortTime ? 3 : 5;
-
-  const shootingDrill = { type: 'drill', name: 'Shooting Session', focus: 'Shooting', duration: timePerDay, items: filterDrills('Shooting', drillCount) };
-  const handlesDrill = { type: 'drill', name: 'Ball Handling Session', focus: 'Ball Handling', duration: timePerDay, items: filterDrills('Ball Handling', drillCount) };
-  const defenseDrill = { type: 'drill', name: 'Defense Session', focus: 'Defense', duration: timePerDay, items: filterDrills('Defense', drillCount) };
-  const finishingDrill = { type: 'drill', name: 'Finishing Session', focus: 'Finishing', duration: timePerDay, items: filterDrills('Finishing', drillCount) };
-  const conditioningDrill = { type: 'drill', name: 'Conditioning Session', focus: 'Conditioning', duration: timePerDay, items: filterDrills('Conditioning', drillCount) };
-  const fullDrill = { type: 'drill', name: 'Full Skill Session', focus: 'All Skills', duration: timePerDay, items: [...filterDrills('Shooting', 2), ...filterDrills('Ball Handling', 1)] };
-
-  const upperGym = { type: 'gym', name: 'Upper Body', focus: 'Chest/Back/Shoulders', duration: timePerDay, items: [...filterExercises('Chest', 2), ...filterExercises('Back', 2), ...filterExercises('Shoulders', 1)] };
-  const lowerGym = { type: 'gym', name: 'Lower Body', focus: 'Legs/Core', duration: timePerDay, items: [...filterExercises('Legs', 3), ...filterExercises('Core', 2)] };
-  const fullGym = { type: 'gym', name: 'Full Body', focus: 'Full Body', duration: timePerDay, items: [...filterExercises('Chest', 1), ...filterExercises('Back', 1), ...filterExercises('Legs', 2), ...filterExercises('Core', 1)] };
-  const rest = { type: 'rest', name: 'Rest Day', focus: 'Recovery', duration: 0, items: ['Light stretching (optional)', 'Foam roll', 'Stay hydrated'] };
+  const hasSpeed    = goals.includes('speed');
+  const hasDefense  = goals.includes('defense');
+  const allAround   = goals.includes('allaround') || goals.length === 0;
 
   let schedule = {};
 
   if (hasStrength && gymAccess) {
     schedule = {
-      monday: hasShooting ? shootingDrill : fullDrill,
-      tuesday: upperGym,
-      wednesday: hasHandles ? handlesDrill : fullDrill,
-      thursday: lowerGym,
-      friday: hasDefense ? defenseDrill : finishingDrill,
-      saturday: hasSpeed ? conditioningDrill : fullGym,
-      sunday: rest,
+      monday:    hasShooting ? shootingSession  : fullSession,
+      tuesday:   upperGym,
+      wednesday: hasHandles  ? handlesSession   : fullSession,
+      thursday:  lowerGym,
+      friday:    hasDefense  ? defenseSession   : finishingSession,
+      saturday:  hasSpeed    ? conditionSession : fullGym,
+      sunday:    rest,
     };
   } else if (hasSpeed) {
     schedule = {
-      monday: hasShooting ? shootingDrill : fullDrill,
-      tuesday: conditioningDrill,
-      wednesday: hasHandles ? handlesDrill : fullDrill,
-      thursday: rest,
-      friday: hasDefense ? defenseDrill : finishingDrill,
-      saturday: conditioningDrill,
-      sunday: rest,
+      monday:    hasShooting ? shootingSession : fullSession,
+      tuesday:   conditionSession,
+      wednesday: hasHandles  ? handlesSession  : fullSession,
+      thursday:  rest,
+      friday:    hasDefense  ? defenseSession  : finishingSession,
+      saturday:  conditionSession,
+      sunday:    rest,
     };
   } else {
     schedule = {
-      monday: hasShooting || allAround ? shootingDrill : fullDrill,
-      tuesday: rest,
-      wednesday: hasHandles || allAround ? handlesDrill : fullDrill,
-      thursday: hasDefense || allAround ? defenseDrill : rest,
-      friday: finishingDrill,
-      saturday: conditioningDrill,
-      sunday: rest,
+      monday:    hasShooting || allAround ? shootingSession  : fullSession,
+      tuesday:   rest,
+      wednesday: hasHandles  || allAround ? handlesSession   : fullSession,
+      thursday:  hasDefense  || allAround ? defenseSession   : rest,
+      friday:    finishingSession,
+      saturday:  hasSpeed    ? conditionSession : fullSession,
+      sunday:    rest,
     };
+  }
+
+  for (const day of Object.keys(schedule)) {
+    if (gameDayKeys.has(day)) schedule[day] = gameDay;
   }
 
   return schedule;

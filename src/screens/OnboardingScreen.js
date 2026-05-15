@@ -14,7 +14,15 @@ const GOAL_OPTIONS = [
   { id: 'allaround', label: 'All-Around Game', emoji: '⭐' },
 ];
 
-const TIME_OPTIONS = [20, 30, 45, 60, 90];
+const AGE_GROUPS = [
+  { id: 'u12',  label: 'Under 12',   emoji: '🌱' },
+  { id: '13-15', label: '13 – 15',   emoji: '📈' },
+  { id: '16-18', label: '16 – 18',   emoji: '🔥' },
+  { id: '19-22', label: '19 – 22',   emoji: '💪' },
+  { id: '23+',  label: '23 and over', emoji: '🏆' },
+];
+
+const WEEK_DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
 
 export default function OnboardingScreen() {
   const { setProfile, setRoutine } = useApp();
@@ -24,21 +32,23 @@ export default function OnboardingScreen() {
   const [time, setTime] = useState(45);
   const [level, setLevel] = useState('Intermediate');
   const [gym, setGym] = useState(false);
+  const [ageGroup, setAgeGroup] = useState('');
+  const [gameDays, setGameDays] = useState([]);
 
   const toggleGoal = id => setGoals(p => p.includes(id) ? p.filter(g => g !== id) : [...p, id]);
+  const toggleGameDay = d => setGameDays(p => p.includes(d) ? p.filter(x => x !== d) : [...p, d]);
 
   const finish = () => {
-    const profile = { goals, timePerDay: time, skillLevel: level, gymAccess: gym, equipment: [] };
+    const profile = { goals, timePerDay: time, skillLevel: level, gymAccess: gym, equipment: [], ageGroup, gameDays };
     setProfile(profile);
     setRoutine(generateRoutine(profile));
   };
 
-  const Steps = [WelcomeStep, GoalsStep, SetupStep, ReadyStep];
+  const Steps = [WelcomeStep, GoalsStep, SetupStep, ScheduleStep, ReadyStep];
   const StepComponent = Steps[step];
 
   return (
     <View style={[s.container, { paddingTop: insets.top, paddingBottom: insets.bottom + 24 }]}>
-      {/* Progress dots */}
       <View style={s.dots}>
         {Steps.map((_, i) => (
           <View key={i} style={[s.dot, { width: i === step ? 24 : 8, backgroundColor: i <= step ? colors.blue500 : colors.gray200 }]} />
@@ -50,6 +60,8 @@ export default function OnboardingScreen() {
         time={time} setTime={setTime}
         level={level} setLevel={setLevel}
         gym={gym} setGym={setGym}
+        ageGroup={ageGroup} setAgeGroup={setAgeGroup}
+        gameDays={gameDays} onToggleGameDay={toggleGameDay}
         onNext={() => setStep(s => s + 1)}
         onFinish={finish}
       />
@@ -99,11 +111,23 @@ function GoalsStep({ goals, onToggleGoal, onNext }) {
   );
 }
 
-function SetupStep({ time, setTime, level, setLevel, gym, setGym, onNext }) {
+function SetupStep({ time, setTime, level, setLevel, gym, setGym, ageGroup, setAgeGroup, onNext }) {
+  const TIME_OPTIONS = [20, 30, 45, 60, 90];
   return (
     <ScrollView contentContainerStyle={s.stepContent} showsVerticalScrollIndicator={false}>
-      <Text style={s.stepTitle}>Quick setup</Text>
-      <Text style={s.stepSub}>Tell us about your situation.</Text>
+      <Text style={s.stepTitle}>About you</Text>
+      <Text style={s.stepSub}>Quick setup so we can personalise your plan.</Text>
+
+      <Text style={s.sectionLabel}>How old are you?</Text>
+      <View style={{ gap: 8, marginBottom: 20 }}>
+        {AGE_GROUPS.map(a => (
+          <TouchableOpacity key={a.id} onPress={() => setAgeGroup(a.id)}
+            style={[s.rowBtn, ageGroup === a.id && s.rowBtnActive]}>
+            <Text style={{ fontSize: 20 }}>{a.emoji}</Text>
+            <Text style={[s.rowBtnText, ageGroup === a.id && { color: colors.white }]}>{a.label}</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
 
       <Text style={s.sectionLabel}>Daily training time</Text>
       <View style={s.row}>
@@ -132,8 +156,35 @@ function SetupStep({ time, setTime, level, setLevel, gym, setGym, onNext }) {
         ))}
       </View>
 
-      <TouchableOpacity style={[s.btnBlue, { marginTop: 24 }]} onPress={onNext}>
+      <TouchableOpacity style={[s.btnBlue, { marginTop: 8, opacity: !ageGroup ? 0.4 : 1 }]} onPress={onNext} disabled={!ageGroup}>
         <Text style={s.btnBlueText}>Continue →</Text>
+      </TouchableOpacity>
+    </ScrollView>
+  );
+}
+
+function ScheduleStep({ gameDays, onToggleGameDay, onNext }) {
+  return (
+    <ScrollView contentContainerStyle={s.stepContent} showsVerticalScrollIndicator={false}>
+      <Text style={s.stepTitle}>Game days</Text>
+      <Text style={s.stepSub}>Which days do you usually play games? We'll keep those light so you're fresh to compete.</Text>
+      <Text style={[s.stepSub, { fontSize: 13, color: colors.gray400, marginTop: -12 }]}>Skip if you don't play in a league.</Text>
+
+      <View style={{ gap: 8, marginBottom: 24 }}>
+        {WEEK_DAYS.map(day => {
+          const sel = gameDays.includes(day);
+          return (
+            <TouchableOpacity key={day} onPress={() => onToggleGameDay(day)} activeOpacity={0.7}
+              style={[s.rowBtn, sel && s.rowBtnActive, { justifyContent: 'space-between' }]}>
+              <Text style={[s.rowBtnText, sel && { color: colors.white }]}>{day}</Text>
+              {sel && <Text style={{ fontSize: 18 }}>🏀</Text>}
+            </TouchableOpacity>
+          );
+        })}
+      </View>
+
+      <TouchableOpacity style={s.btnBlue} onPress={onNext}>
+        <Text style={s.btnBlueText}>{gameDays.length === 0 ? 'Skip →' : 'Continue →'}</Text>
       </TouchableOpacity>
     </ScrollView>
   );
@@ -141,12 +192,12 @@ function SetupStep({ time, setTime, level, setLevel, gym, setGym, onNext }) {
 
 function ReadyStep({ onFinish }) {
   return (
-    <ScrollView contentContainerStyle={[s.stepContent, { alignItems: 'center', textAlign: 'center' }]} showsVerticalScrollIndicator={false}>
+    <ScrollView contentContainerStyle={[s.stepContent, { alignItems: 'center' }]} showsVerticalScrollIndicator={false}>
       <Text style={{ fontSize: 72, marginTop: 24, marginBottom: 20 }}>🚀</Text>
       <Text style={s.stepTitle}>You're all set!</Text>
-      <Text style={[s.stepSub, { textAlign: 'center' }]}>Your AI-personalized routine is ready. Train daily to build your streak.</Text>
+      <Text style={[s.stepSub, { textAlign: 'center' }]}>Your personalised routine is ready. Game days are blocked off. Train daily and build that streak.</Text>
       <View style={s.readySummary}>
-        {['📅 7-day personalized routine', '🏀 Drills matched to your goals', '🔥 Daily streak tracking', '📈 Progress dashboard', '🏆 Achievement badges'].map((item, i) => (
+        {['📅 7-day personalised routine', '🏀 Drills matched to your goals', '🎮 Game days kept light', '🔥 Daily streak tracking', '🏆 Achievement badges'].map((item, i) => (
           <Text key={i} style={s.readyItem}>{item}</Text>
         ))}
       </View>
@@ -167,16 +218,19 @@ const s = StyleSheet.create({
   featureChip: { backgroundColor: colors.gray100, borderRadius: 999, paddingHorizontal: 14, paddingVertical: 7 },
   featureChipText: { fontSize: 13, fontWeight: '500', color: colors.gray700 },
   stepTitle: { fontSize: 26, fontWeight: '800', color: colors.black, marginTop: 8 },
-  stepSub: { fontSize: 15, color: colors.gray500, marginTop: 6, marginBottom: 24 },
-  sectionLabel: { fontSize: 14, fontWeight: '700', color: colors.black, marginBottom: 10, marginTop: 4 },
+  stepSub: { fontSize: 15, color: colors.gray500, marginTop: 6, marginBottom: 20 },
+  sectionLabel: { fontSize: 14, fontWeight: '700', color: colors.black, marginBottom: 10 },
   grid2: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginBottom: 24 },
   goalCard: { width: '47%', backgroundColor: colors.gray100, borderRadius: 14, padding: 18, alignItems: 'center', gap: 8, borderWidth: 2, borderColor: colors.gray200 },
   goalCardActive: { backgroundColor: colors.black, borderColor: colors.black },
   goalLabel: { fontSize: 13, fontWeight: '600', color: colors.gray700, textAlign: 'center' },
   row: { flexDirection: 'row', gap: 8, marginBottom: 20 },
-  optionBtn: { paddingVertical: 12, paddingHorizontal: 8, borderRadius: 12, borderWidth: 2, borderColor: colors.gray200, backgroundColor: colors.gray100, alignItems: 'center' },
+  optionBtn: { flex: 1, paddingVertical: 12, paddingHorizontal: 8, borderRadius: 12, borderWidth: 2, borderColor: colors.gray200, backgroundColor: colors.gray100, alignItems: 'center' },
   optionBtnActive: { backgroundColor: colors.black, borderColor: colors.black },
   optionText: { fontSize: 13, fontWeight: '600', color: colors.gray500 },
+  rowBtn: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 12, paddingHorizontal: 16, borderRadius: 12, borderWidth: 2, borderColor: colors.gray200, backgroundColor: colors.gray100 },
+  rowBtnActive: { backgroundColor: colors.black, borderColor: colors.black },
+  rowBtnText: { fontSize: 15, fontWeight: '600', color: colors.gray700 },
   readySummary: { backgroundColor: colors.blue50, borderRadius: 16, padding: 20, width: '100%', marginTop: 28, marginBottom: 32, gap: 10 },
   readyItem: { fontSize: 15, color: colors.gray700 },
   btnBlack: { backgroundColor: colors.black, borderRadius: 14, padding: 18, alignItems: 'center', width: '100%' },
