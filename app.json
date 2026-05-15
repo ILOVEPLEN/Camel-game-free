@@ -1,0 +1,23 @@
+{
+  "expo": {
+    "name": "Project Ball",
+    "slug": "project-ball",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "backgroundColor": "#0EA5E9"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.projectball.app"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#0EA5E9"
+      },
+      "package": "com.projectball.app"
+    },
+    "platforms": ["ios", "android"]
+  }
+}
