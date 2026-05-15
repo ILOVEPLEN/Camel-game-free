@@ -123,6 +123,10 @@ export function AppProvider({ children }) {
     update(prev => ({ ...prev, routine }));
   }, [update]);
 
+  const resetOnboarding = useCallback(() => {
+    update(prev => ({ ...prev, onboarded: false }));
+  }, [update]);
+
   const useStreakFreeze = useCallback(() => {
     update(prev => {
       if (prev.streak.freezesAvailable <= 0) return prev;
@@ -152,6 +156,7 @@ export function AppProvider({ children }) {
       updateGymProgress,
       setProfile,
       setRoutine,
+      resetOnboarding,
       useStreakFreeze,
       trainedToday,
     }}>

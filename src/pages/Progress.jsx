@@ -29,7 +29,7 @@ function getLast4Weeks() {
 }
 
 export default function Progress() {
-  const { state } = useApp();
+  const { state, resetOnboarding } = useApp();
   const { streak, workoutLog, achievements, gymProgress, profile } = state;
   const [section, setSection] = useState('overview');
 
@@ -69,7 +69,7 @@ export default function Progress() {
       </div>
 
       <div style={{ padding: '20px' }}>
-        {section === 'overview' && <OverviewSection streak={streak} workoutLog={workoutLog} thisWeekLogs={thisWeekLogs} thisMonthLogs={thisMonthLogs} totalMinutes={totalMinutes} />}
+        {section === 'overview' && <OverviewSection streak={streak} workoutLog={workoutLog} thisWeekLogs={thisWeekLogs} thisMonthLogs={thisMonthLogs} totalMinutes={totalMinutes} onRedoSetup={resetOnboarding} />}
         {section === 'activity' && <ActivitySection workoutLog={workoutLog} streak={streak} />}
         {section === 'gym' && <GymSection gymProgress={gymProgress} />}
         {section === 'badges' && <BadgesSection achievements={achievements} />}
@@ -88,7 +88,7 @@ function StatBox({ value, label, sub, color = '#0EA5E9' }) {
   );
 }
 
-function OverviewSection({ streak, workoutLog, thisWeekLogs, thisMonthLogs, totalMinutes }) {
+function OverviewSection({ streak, workoutLog, thisWeekLogs, thisMonthLogs, totalMinutes, onRedoSetup }) {
   const avgRating = workoutLog.filter(w => w.rating).reduce((s, w, _, arr) => s + w.rating / arr.length, 0);
 
   return (
@@ -114,6 +114,17 @@ function OverviewSection({ streak, workoutLog, thisWeekLogs, thisMonthLogs, tota
           <WorkoutTypeBreakdown workoutLog={workoutLog} />
         </>
       )}
+
+      {/* Settings */}
+      <div style={{ marginTop: '32px', paddingTop: '20px', borderTop: '1px solid #F1F5F9' }}>
+        <h3 className="section-title">Settings</h3>
+        <button onClick={onRedoSetup} style={{
+          width: '100%', padding: '14px', borderRadius: '12px', fontSize: '14px', fontWeight: '600',
+          background: '#F8FAFC', border: '1.5px solid #E2E8F0', color: '#334155', cursor: 'pointer',
+        }}>
+          ⚙️ Redo Setup &amp; Update My Profile
+        </button>
+      </div>
     </>
   );
 }
