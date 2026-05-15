@@ -56,6 +56,7 @@ export default function Progress() {
             { id: 'activity', label: '📅 Activity' },
             { id: 'gym', label: '🏋️ Gym' },
             { id: 'badges', label: '🏆 Badges' },
+            { id: 'settings', label: '⚙️ Settings' },
           ].map(s => (
             <button key={s.id} onClick={() => setSection(s.id)} style={{
               padding: '9px 14px', borderRadius: '10px', fontWeight: '700', fontSize: '13px',
@@ -69,10 +70,11 @@ export default function Progress() {
       </div>
 
       <div style={{ padding: '20px' }}>
-        {section === 'overview' && <OverviewSection streak={streak} workoutLog={workoutLog} thisWeekLogs={thisWeekLogs} thisMonthLogs={thisMonthLogs} totalMinutes={totalMinutes} onRedoSetup={resetOnboarding} />}
+        {section === 'overview' && <OverviewSection streak={streak} workoutLog={workoutLog} thisWeekLogs={thisWeekLogs} thisMonthLogs={thisMonthLogs} totalMinutes={totalMinutes} />}
         {section === 'activity' && <ActivitySection workoutLog={workoutLog} streak={streak} />}
         {section === 'gym' && <GymSection gymProgress={gymProgress} />}
         {section === 'badges' && <BadgesSection achievements={achievements} />}
+        {section === 'settings' && <SettingsSection onRedoSetup={resetOnboarding} />}
       </div>
     </div>
   );
@@ -88,12 +90,11 @@ function StatBox({ value, label, sub, color = '#0EA5E9' }) {
   );
 }
 
-function OverviewSection({ streak, workoutLog, thisWeekLogs, thisMonthLogs, totalMinutes, onRedoSetup }) {
+function OverviewSection({ streak, workoutLog, thisWeekLogs, thisMonthLogs, totalMinutes }) {
   const avgRating = workoutLog.filter(w => w.rating).reduce((s, w, _, arr) => s + w.rating / arr.length, 0);
 
   return (
     <>
-      {/* Key stats */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '24px' }}>
         <StatBox value={`${streak.current}🔥`} label="Current Streak" sub={`Best: ${streak.longest}`} color="#0F172A" />
         <StatBox value={workoutLog.length} label="Total Workouts" sub="all time" />
@@ -103,28 +104,37 @@ function OverviewSection({ streak, workoutLog, thisWeekLogs, thisMonthLogs, tota
         <StatBox value={avgRating ? avgRating.toFixed(1) + '⭐' : '—'} label="Avg Rating" sub="per session" />
       </div>
 
-      {/* Weekly bar chart */}
       <h3 className="section-title">Last 7 Days</h3>
       <WeeklyChart workoutLog={workoutLog} />
 
-      {/* Workout type breakdown */}
       {workoutLog.length > 0 && (
         <>
           <h3 className="section-title" style={{ marginTop: '24px' }}>Workout Breakdown</h3>
           <WorkoutTypeBreakdown workoutLog={workoutLog} />
         </>
       )}
+    </>
+  );
+}
 
-      {/* Settings */}
-      <div style={{ marginTop: '32px', paddingTop: '20px', borderTop: '1px solid #F1F5F9' }}>
-        <h3 className="section-title">Settings</h3>
-        <button onClick={onRedoSetup} style={{
-          width: '100%', padding: '14px', borderRadius: '12px', fontSize: '14px', fontWeight: '600',
-          background: '#F8FAFC', border: '1.5px solid #E2E8F0', color: '#334155', cursor: 'pointer',
-        }}>
-          ⚙️ Redo Setup &amp; Update My Profile
-        </button>
-      </div>
+function SettingsSection({ onRedoSetup }) {
+  return (
+    <>
+      <h3 className="section-title">Profile</h3>
+      <button onClick={onRedoSetup} style={{
+        width: '100%', padding: '16px 18px', borderRadius: '14px', fontSize: '15px', fontWeight: '700',
+        background: '#0F172A', border: 'none', color: '#fff', cursor: 'pointer',
+        display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px',
+      }}>
+        <span style={{ fontSize: '20px' }}>⚙️</span>
+        <div style={{ textAlign: 'left' }}>
+          <div>Redo Setup</div>
+          <div style={{ fontSize: '12px', fontWeight: '400', color: 'rgba(255,255,255,0.6)', marginTop: '2px' }}>Update your position, equipment & goals</div>
+        </div>
+      </button>
+      <p style={{ fontSize: '13px', color: '#94A3B8', textAlign: 'center', marginTop: '8px' }}>
+        Your workout history and streak will be kept.
+      </p>
     </>
   );
 }
