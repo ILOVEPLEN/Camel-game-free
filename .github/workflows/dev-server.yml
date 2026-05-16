@@ -23,12 +23,14 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '18'
-          cache: 'npm'
-          cache-dependency-path: project-ball/package-lock.json
 
       - name: Install dependencies
         working-directory: project-ball
-        run: npm ci
+        run: npm install
+
+      - name: Fix SDK 54 dependency versions
+        working-directory: project-ball
+        run: npx expo install --fix
 
       - name: Install Expo ngrok
         run: npm install -g @expo/ngrok@^4.1.0
@@ -39,27 +41,26 @@ jobs:
           MINUTES: ${{ github.event.inputs.minutes || '20' }}
           EXPO_NO_TELEMETRY: 1
         run: |
-          # Run WITHOUT CI=1 so expo prints the tunnel URL
-          # Strip ANSI colour codes so grep works
+          # Run without CI=1 so expo prints the full tunnel URL
           npx expo start --tunnel 2>&1 \
             | sed 's/\x1b\[[0-9;]*[mGKHFJA-Z]//g' \
             | tee /tmp/expo.log &
 
-          echo "Waiting for tunnel URL in logs..."
+          echo "Waiting for tunnel URL..."
           TUNNEL_URL=""
           for i in $(seq 1 50); do
             sleep 3
 
-            # Look for exp:// URL anywhere in the log
+            # Method 1: grep log for exp:// URL (non-localhost)
             FOUND=$(grep -oE 'exp://[a-zA-Z0-9._-]+\.[a-zA-Z0-9._-]+' /tmp/expo.log \
                     | grep -v localhost | head -1)
             if [ -n "$FOUND" ]; then
               TUNNEL_URL="$FOUND"
-              echo "Found URL after ${i}x3s: $TUNNEL_URL"
+              echo "Found in log after ${i}x3s: $TUNNEL_URL"
               break
             fi
 
-            # Also try the ngrok local API as fallback
+            # Method 2: ngrok local API
             NGROK=$(curl -s http://localhost:4040/api/tunnels 2>/dev/null \
               | python3 -c "
 import sys,json
@@ -73,14 +74,14 @@ except: pass
             if [ -n "$NGROK" ]; then
               HOST="${NGROK#https://}"; HOST="${HOST#http://}"
               TUNNEL_URL="exp://$HOST"
-              echo "Found URL via ngrok API after ${i}x3s: $TUNNEL_URL"
+              echo "Found via ngrok API after ${i}x3s: $TUNNEL_URL"
               break
             fi
 
             echo "Still waiting... ($i/50)"
           done
 
-          echo "--- Full expo log so far ---"
+          echo "--- Full expo log ---"
           cat /tmp/expo.log
 
           if [ -z "$TUNNEL_URL" ]; then
@@ -88,7 +89,7 @@ except: pass
             exit 1
           fi
 
-          # Generate QR image
+          # QR image
           ENCODED=$(python3 -c \
             "import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1],safe=''))" \
             "$TUNNEL_URL")
@@ -105,7 +106,7 @@ except: pass
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "> Server alive for **${MINUTES} minutes**. First bundle ~60s." >> "$GITHUB_STEP_SUMMARY"
 
-          # ASCII QR in logs
+          # ASCII QR + URL in logs
           npx qrcode-terminal "$TUNNEL_URL" || true
           echo "=================================="
           echo "EXPO URL: $TUNNEL_URL"
