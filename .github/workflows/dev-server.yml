@@ -1,0 +1,100 @@
+name: 🏀 Project Ball — Dev Server
+
+on:
+  workflow_dispatch:
+    inputs:
+      minutes:
+        description: 'Minutes to keep server alive (max 30)'
+        default: '20'
+        required: false
+
+jobs:
+  serve:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: claude/basketball-training-app-mvp-tivEA
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: project-ball/package-lock.json
+
+      - name: Install dependencies
+        working-directory: project-ball
+        run: npm ci
+
+      - name: Install Expo ngrok
+        run: npm install -g @expo/ngrok@^4.1.0
+
+      - name: Start dev server + tunnel → QR code
+        working-directory: project-ball
+        env:
+          EXPO_NO_TELEMETRY: 1
+        run: |
+          # Start Expo with tunnel, stream output to log
+          CI=1 npx expo start --tunnel 2>&1 | tee /tmp/expo.log &
+
+          # Wait up to 90s for ngrok URL to appear
+          echo "Waiting for tunnel URL..."
+          TUNNEL_URL=""
+          for i in $(seq 1 30); do
+            TUNNEL_URL=$(grep -oE 'exp://[a-zA-Z0-9._-]+' /tmp/expo.log | head -1)
+            if [ -n "$TUNNEL_URL" ]; then
+              echo "Tunnel ready after ${i}x3s"
+              break
+            fi
+            # Also try to grab a raw ngrok host if expo URL format differs
+            NGROK_HOST=$(grep -oE '[a-z0-9-]+\.ngrok\.io' /tmp/expo.log | head -1)
+            if [ -n "$NGROK_HOST" ]; then
+              TUNNEL_URL="exp://$NGROK_HOST"
+              echo "Got ngrok host: $NGROK_HOST"
+              break
+            fi
+            sleep 3
+          done
+
+          if [ -z "$TUNNEL_URL" ]; then
+            echo "Could not get tunnel URL. Full expo log:"
+            cat /tmp/expo.log
+            exit 1
+          fi
+
+          echo "Expo URL: $TUNNEL_URL"
+
+          # Generate QR code image via free API
+          ENCODED=$(python3 -c "import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1],safe=''))" "$TUNNEL_URL")
+          QR_IMG="https://api.qrserver.com/v1/create-qr-code/?size=500x500&ecc=M&data=$ENCODED"
+
+          # Write to Job Summary (visible in GitHub Actions UI)
+          cat >> $GITHUB_STEP_SUMMARY << SUMMARY
+          ## 🏀 Project Ball — Dev Server Running
+
+          Open **Expo Go** on your iPhone and scan:
+
+          ![QR Code]($QR_IMG)
+
+          **Or copy this URL into Expo Go → Enter URL manually:**
+          \`\`\`
+          $TUNNEL_URL
+          \`\`\`
+
+          > ⏱ Server stays alive for **${{ github.event.inputs.minutes }} minutes**
+          > 📦 First load takes ~60 seconds to bundle
+          SUMMARY
+
+          # Also print ASCII QR to logs as fallback
+          npx qrcode-terminal "$TUNNEL_URL" || true
+          echo ""
+          echo "=================================="
+          echo "EXPO URL: $TUNNEL_URL"
+          echo "=================================="
+
+          # Keep the server alive for the requested duration
+          sleep $(( ${{ github.event.inputs.minutes }} * 60 ))
