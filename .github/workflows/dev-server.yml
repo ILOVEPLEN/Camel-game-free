@@ -27,13 +27,9 @@ jobs:
         with:
           node-version: '18'
 
-      - name: Install dependencies
+      - name: Install and fix dependencies
         working-directory: project-ball
-        run: npm install
-
-      - name: Fix SDK 54 dependency versions
-        working-directory: project-ball
-        run: npx expo install --fix
+        run: npm install && npx expo install --fix
 
       - name: Install Expo ngrok
         run: npm install -g @expo/ngrok@^4.1.0
@@ -44,37 +40,25 @@ jobs:
           MINUTES: ${{ github.event.inputs.minutes || '20' }}
           EXPO_NO_TELEMETRY: 1
         run: |
-          npx expo start --tunnel 2>&1 \
-            | sed 's/\x1b\[[0-9;]*[mGKHFJA-Z]//g' \
-            | tee /tmp/expo.log &
+          npx expo start --tunnel 2>&1 | sed 's/\x1b\[[0-9;]*[mGKHFJA-Z]//g' | tee /tmp/expo.log &
 
           echo "Waiting for tunnel URL..."
           TUNNEL_URL=""
           for i in $(seq 1 50); do
             sleep 3
 
-            FOUND=$(grep -oE 'exp://[a-zA-Z0-9._-]+\.[a-zA-Z0-9._-]+' /tmp/expo.log \
-                    | grep -v localhost | head -1)
+            FOUND=$(grep -oE 'exp://[a-zA-Z0-9._-]+\.[a-zA-Z0-9._-]+' /tmp/expo.log | grep -v localhost | head -1)
             if [ -n "$FOUND" ]; then
               TUNNEL_URL="$FOUND"
-              echo "Found in log after ${i}x3s: $TUNNEL_URL"
+              echo "Found in log: $TUNNEL_URL"
               break
             fi
 
-            NGROK=$(curl -s http://localhost:4040/api/tunnels 2>/dev/null \
-              | python3 -c "
-import sys,json
-try:
-  d=json.load(sys.stdin)
-  for t in d.get('tunnels',[]):
-    u=t.get('public_url','')
-    if u: print(u); break
-except: pass
-" 2>/dev/null)
-            if [ -n "$NGROK" ]; then
-              HOST="${NGROK#https://}"; HOST="${HOST#http://}"
+            NGROK_URL=$(curl -sf http://localhost:4040/api/tunnels 2>/dev/null | python3 -c "import sys,json; d=json.load(sys.stdin); print(next((t['public_url'] for t in d.get('tunnels',[]) if t.get('public_url')),'')); " 2>/dev/null || true)
+            if [ -n "$NGROK_URL" ]; then
+              HOST="${NGROK_URL#https://}"; HOST="${HOST#http://}"
               TUNNEL_URL="exp://$HOST"
-              echo "Found via ngrok API after ${i}x3s: $TUNNEL_URL"
+              echo "Found via ngrok API: $TUNNEL_URL"
               break
             fi
 
@@ -89,9 +73,7 @@ except: pass
             exit 1
           fi
 
-          ENCODED=$(python3 -c \
-            "import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1],safe=''))" \
-            "$TUNNEL_URL")
+          ENCODED=$(python3 -c "import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1],safe=''))" "$TUNNEL_URL")
           QR_IMG="https://api.qrserver.com/v1/create-qr-code/?size=500x500&ecc=M&data=$ENCODED"
 
           echo "## 🏀 Project Ball — Dev Server Running" >> "$GITHUB_STEP_SUMMARY"
