@@ -30,59 +30,85 @@ jobs:
         working-directory: project-ball
         run: npm ci
 
-      - name: Start Metro bundler
-        working-directory: project-ball
-        run: |
-          EXPO_NO_TELEMETRY=1 npx expo start 2>&1 &
-          echo "Waiting for Metro..."
-          for i in $(seq 1 30); do
-            if curl -sf http://localhost:8081/status 2>/dev/null | grep -q running; then
-              echo "Metro ready!"
-              break
-            fi
-            sleep 3
-          done
+      - name: Install Expo ngrok
+        run: npm install -g @expo/ngrok@^4.1.0
 
-      - name: Tunnel + QR code
+      - name: Start server and get URL
+        working-directory: project-ball
         env:
           MINUTES: ${{ github.event.inputs.minutes || '20' }}
+          EXPO_NO_TELEMETRY: 1
         run: |
-          # Open localtunnel on Metro's port
-          npx localtunnel --port 8081 2>&1 | tee /tmp/lt.log &
-          sleep 15
+          # Run WITHOUT CI=1 so expo prints the tunnel URL
+          # Strip ANSI colour codes so grep works
+          npx expo start --tunnel 2>&1 \
+            | sed 's/\x1b\[[0-9;]*[mGKHFJA-Z]//g' \
+            | tee /tmp/expo.log &
 
-          LT_URL=$(grep -oE 'https://[a-z0-9-]+\.loca\.lt' /tmp/lt.log | head -1)
+          echo "Waiting for tunnel URL in logs..."
+          TUNNEL_URL=""
+          for i in $(seq 1 50); do
+            sleep 3
 
-          echo "--- localtunnel log ---"
-          cat /tmp/lt.log
+            # Look for exp:// URL anywhere in the log
+            FOUND=$(grep -oE 'exp://[a-zA-Z0-9._-]+\.[a-zA-Z0-9._-]+' /tmp/expo.log \
+                    | grep -v localhost | head -1)
+            if [ -n "$FOUND" ]; then
+              TUNNEL_URL="$FOUND"
+              echo "Found URL after ${i}x3s: $TUNNEL_URL"
+              break
+            fi
 
-          if [ -z "$LT_URL" ]; then
-            echo "ERROR: No tunnel URL found"
+            # Also try the ngrok local API as fallback
+            NGROK=$(curl -s http://localhost:4040/api/tunnels 2>/dev/null \
+              | python3 -c "
+import sys,json
+try:
+  d=json.load(sys.stdin)
+  for t in d.get('tunnels',[]):
+    u=t.get('public_url','')
+    if u: print(u); break
+except: pass
+" 2>/dev/null)
+            if [ -n "$NGROK" ]; then
+              HOST="${NGROK#https://}"; HOST="${HOST#http://}"
+              TUNNEL_URL="exp://$HOST"
+              echo "Found URL via ngrok API after ${i}x3s: $TUNNEL_URL"
+              break
+            fi
+
+            echo "Still waiting... ($i/50)"
+          done
+
+          echo "--- Full expo log so far ---"
+          cat /tmp/expo.log
+
+          if [ -z "$TUNNEL_URL" ]; then
+            echo "ERROR: Could not get tunnel URL"
             exit 1
           fi
 
-          EXPO_URL="exp://${LT_URL#https://}"
-          echo "Expo URL: $EXPO_URL"
-
-          # QR code image via free API
-          ENCODED=$(python3 -c "import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1],safe=''))" "$EXPO_URL")
+          # Generate QR image
+          ENCODED=$(python3 -c \
+            "import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1],safe=''))" \
+            "$TUNNEL_URL")
           QR_IMG="https://api.qrserver.com/v1/create-qr-code/?size=500x500&ecc=M&data=$ENCODED"
 
-          # Write to job summary
+          # Job summary
           echo "## 🏀 Project Ball — Dev Server Running" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "**Scan with Expo Go:**" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "![QR Code]($QR_IMG)" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "\`$EXPO_URL\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "\`$TUNNEL_URL\`" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "> Server alive for **${MINUTES} minutes**. First bundle load ~60s." >> "$GITHUB_STEP_SUMMARY"
+          echo "> Server alive for **${MINUTES} minutes**. First bundle ~60s." >> "$GITHUB_STEP_SUMMARY"
 
-          # ASCII QR in logs too
-          npx qrcode-terminal "$EXPO_URL" || true
+          # ASCII QR in logs
+          npx qrcode-terminal "$TUNNEL_URL" || true
           echo "=================================="
-          echo "EXPO URL: $EXPO_URL"
+          echo "EXPO URL: $TUNNEL_URL"
           echo "=================================="
 
           sleep $(( MINUTES * 60 ))
