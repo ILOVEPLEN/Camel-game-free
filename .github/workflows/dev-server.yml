@@ -38,40 +38,65 @@ jobs:
         env:
           EXPO_NO_TELEMETRY: 1
         run: |
-          # Start Expo with tunnel, stream output to log
+          # Start Expo with tunnel (uses port 8081 by default)
           CI=1 npx expo start --tunnel 2>&1 | tee /tmp/expo.log &
 
-          # Wait up to 90s for ngrok URL to appear
-          echo "Waiting for tunnel URL..."
+          # Wait for ngrok to be ready then query its local API for the URL
+          echo "Waiting for tunnel..."
           TUNNEL_URL=""
-          for i in $(seq 1 30); do
-            TUNNEL_URL=$(grep -oE 'exp://[a-zA-Z0-9._-]+' /tmp/expo.log | head -1)
-            if [ -n "$TUNNEL_URL" ]; then
-              echo "Tunnel ready after ${i}x3s"
-              break
-            fi
-            NGROK_HOST=$(grep -oE '[a-z0-9-]+\.ngrok\.io' /tmp/expo.log | head -1)
-            if [ -n "$NGROK_HOST" ]; then
-              TUNNEL_URL="exp://$NGROK_HOST"
-              echo "Got ngrok host: $NGROK_HOST"
-              break
-            fi
+          for i in $(seq 1 40); do
             sleep 3
+
+            # Method 1: query ngrok local API (most reliable)
+            NGROK_JSON=$(curl -s http://localhost:4040/api/tunnels 2>/dev/null)
+            if [ -n "$NGROK_JSON" ]; then
+              PUBLIC_URL=$(echo "$NGROK_JSON" | python3 -c "
+import sys, json
+data = json.load(sys.stdin)
+tunnels = data.get('tunnels', [])
+for t in tunnels:
+    url = t.get('public_url', '')
+    if url:
+        print(url)
+        break
+" 2>/dev/null)
+              if [ -n "$PUBLIC_URL" ]; then
+                # Strip https:// and build exp:// URL
+                HOST="${PUBLIC_URL#https://}"
+                HOST="${HOST#http://}"
+                TUNNEL_URL="exp://$HOST"
+                echo "Got URL from ngrok API: $TUNNEL_URL"
+                break
+              fi
+            fi
+
+            # Method 2: grep the log for any exp:// URL
+            FOUND=$(grep -oE 'exp://[a-zA-Z0-9._-]+' /tmp/expo.log | head -1)
+            if [ -n "$FOUND" ]; then
+              TUNNEL_URL="$FOUND"
+              echo "Got URL from log: $TUNNEL_URL"
+              break
+            fi
+
+            echo "Still waiting... ($i/40)"
           done
 
+          # Show full log for debugging regardless
+          echo "--- Expo log ---"
+          cat /tmp/expo.log
+
           if [ -z "$TUNNEL_URL" ]; then
-            echo "Could not get tunnel URL. Full expo log:"
-            cat /tmp/expo.log
+            echo "ERROR: Could not get tunnel URL"
             exit 1
           fi
 
-          echo "Expo URL: $TUNNEL_URL"
+          echo "Final Expo URL: $TUNNEL_URL"
 
-          # Generate QR code image via free API
+          # Generate QR code image
           ENCODED=$(python3 -c "import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1],safe=''))" "$TUNNEL_URL")
           QR_IMG="https://api.qrserver.com/v1/create-qr-code/?size=500x500&ecc=M&data=$ENCODED"
 
-          # Write to Job Summary (visible in GitHub Actions UI)
+          # Write to Job Summary
           cat >> $GITHUB_STEP_SUMMARY << SUMMARY
           ## 🏀 Project Ball — Dev Server Running
 
@@ -79,7 +104,7 @@ jobs:
 
           ![QR Code]($QR_IMG)
 
-          **Or copy this URL into Expo Go → Enter URL manually:**
+          **Or enter this URL manually in Expo Go:**
           \`\`\`
           $TUNNEL_URL
           \`\`\`
@@ -88,12 +113,12 @@ jobs:
           > 📦 First load takes ~60 seconds to bundle
           SUMMARY
 
-          # Also print ASCII QR to logs as fallback
+          # Print ASCII QR to logs too
           npx qrcode-terminal "$TUNNEL_URL" || true
           echo ""
           echo "=================================="
           echo "EXPO URL: $TUNNEL_URL"
           echo "=================================="
 
-          # Keep the server alive for the requested duration
+          # Keep server alive
           sleep $(( ${{ github.event.inputs.minutes }} * 60 ))
