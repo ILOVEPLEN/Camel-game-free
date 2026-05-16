@@ -30,85 +30,59 @@ jobs:
         working-directory: project-ball
         run: npm ci
 
-      - name: Install Expo ngrok
-        run: npm install -g @expo/ngrok@^4.1.0
-
-      - name: Start dev server + tunnel
+      - name: Start Metro bundler
         working-directory: project-ball
-        env:
-          EXPO_NO_TELEMETRY: 1
-          MINUTES: ${{ github.event.inputs.minutes || '20' }}
         run: |
-          # Start Expo with tunnel
-          CI=1 npx expo start --tunnel 2>&1 | tee /tmp/expo.log &
-
-          # Wait up to 2 minutes for ngrok API to be ready
-          echo "Waiting for tunnel..."
-          TUNNEL_URL=""
-          for i in $(seq 1 40); do
+          EXPO_NO_TELEMETRY=1 npx expo start 2>&1 &
+          echo "Waiting for Metro..."
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:8081/status 2>/dev/null | grep -q running; then
+              echo "Metro ready!"
+              break
+            fi
             sleep 3
-
-            # Query ngrok local API (most reliable method)
-            PUBLIC_URL=$(curl -s http://localhost:4040/api/tunnels 2>/dev/null \
-              | python3 -c "
-import sys,json
-try:
-  data=json.load(sys.stdin)
-  for t in data.get('tunnels',[]):
-    u=t.get('public_url','')
-    if u: print(u); break
-except: pass
-" 2>/dev/null)
-
-            if [ -n "$PUBLIC_URL" ]; then
-              HOST="${PUBLIC_URL#https://}"
-              HOST="${HOST#http://}"
-              TUNNEL_URL="exp://$HOST"
-              echo "Got tunnel URL: $TUNNEL_URL"
-              break
-            fi
-
-            # Fallback: grep log for exp:// URL
-            FOUND=$(grep -oE 'exp://[a-zA-Z0-9._-]+' /tmp/expo.log | head -1)
-            if [ -n "$FOUND" ]; then
-              TUNNEL_URL="$FOUND"
-              echo "Got URL from log: $TUNNEL_URL"
-              break
-            fi
-
-            echo "Still waiting... ($i/40)"
           done
 
-          echo "--- Full Expo log ---"
-          cat /tmp/expo.log
+      - name: Tunnel + QR code
+        env:
+          MINUTES: ${{ github.event.inputs.minutes || '20' }}
+        run: |
+          # Open localtunnel on Metro's port
+          npx localtunnel --port 8081 2>&1 | tee /tmp/lt.log &
+          sleep 15
 
-          if [ -z "$TUNNEL_URL" ]; then
-            echo "ERROR: Could not get tunnel URL after 2 minutes"
+          LT_URL=$(grep -oE 'https://[a-z0-9-]+\.loca\.lt' /tmp/lt.log | head -1)
+
+          echo "--- localtunnel log ---"
+          cat /tmp/lt.log
+
+          if [ -z "$LT_URL" ]; then
+            echo "ERROR: No tunnel URL found"
             exit 1
           fi
 
-          # Generate QR code image URL
-          ENCODED=$(python3 -c "import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1],safe=''))" "$TUNNEL_URL")
+          EXPO_URL="exp://${LT_URL#https://}"
+          echo "Expo URL: $EXPO_URL"
+
+          # QR code image via free API
+          ENCODED=$(python3 -c "import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1],safe=''))" "$EXPO_URL")
           QR_IMG="https://api.qrserver.com/v1/create-qr-code/?size=500x500&ecc=M&data=$ENCODED"
 
-          # Write job summary using echo (avoids heredoc indentation issues)
+          # Write to job summary
           echo "## 🏀 Project Ball — Dev Server Running" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "Open **Expo Go** on your iPhone and scan:" >> "$GITHUB_STEP_SUMMARY"
+          echo "**Scan with Expo Go:**" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "![QR Code]($QR_IMG)" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "**Or enter manually in Expo Go:**" >> "$GITHUB_STEP_SUMMARY"
-          echo "\`$TUNNEL_URL\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "\`$EXPO_URL\`" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "> Server stays alive for **${MINUTES} minutes**. First load ~60 seconds." >> "$GITHUB_STEP_SUMMARY"
+          echo "> Server alive for **${MINUTES} minutes**. First bundle load ~60s." >> "$GITHUB_STEP_SUMMARY"
 
-          # Print ASCII QR to logs
-          npx qrcode-terminal "$TUNNEL_URL" || true
-          echo ""
+          # ASCII QR in logs too
+          npx qrcode-terminal "$EXPO_URL" || true
           echo "=================================="
-          echo "EXPO URL: $TUNNEL_URL"
+          echo "EXPO URL: $EXPO_URL"
           echo "=================================="
 
-          # Keep server alive
           sleep $(( MINUTES * 60 ))
