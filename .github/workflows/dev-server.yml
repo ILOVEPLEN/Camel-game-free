@@ -25,11 +25,17 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20'
 
-      - name: Install and fix dependencies
+      - name: Install expo CLI and upgrade to SDK 54
         working-directory: project-ball
-        run: npm install && npx expo install --fix
+        run: |
+          npm install
+          npm install expo@~54.0.0 --legacy-peer-deps
+          npx expo install react-native react expo-status-bar \
+            react-native-safe-area-context react-native-screens \
+            react-native-svg @react-native-async-storage/async-storage \
+            --legacy-peer-deps
 
       - name: Install Expo ngrok
         run: npm install -g @expo/ngrok@^4.1.0
