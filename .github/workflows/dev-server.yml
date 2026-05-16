@@ -25,7 +25,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '22'
 
       - name: Install SDK 51 base packages
         working-directory: project-ball
@@ -35,7 +35,7 @@ jobs:
         working-directory: project-ball
         run: |
           npm install expo@~54.0.0 --legacy-peer-deps
-          npx expo install react-native react expo-status-bar react-native-safe-area-context react-native-screens react-native-svg @react-native-async-storage/async-storage --legacy-peer-deps
+          npx expo install react-native react expo-status-bar react-native-safe-area-context react-native-screens react-native-svg @react-native-async-storage/async-storage -- --legacy-peer-deps
 
       - name: Install Expo ngrok
         run: npm install -g @expo/ngrok@^4.1.0
