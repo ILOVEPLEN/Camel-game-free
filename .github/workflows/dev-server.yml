@@ -7,6 +7,9 @@ on:
         description: 'Minutes to keep server alive (max 30)'
         default: '20'
         required: false
+  push:
+    branches: [main]
+    paths: ['.github/workflows/dev-server.yml']
 
 jobs:
   serve:
@@ -41,7 +44,6 @@ jobs:
           MINUTES: ${{ github.event.inputs.minutes || '20' }}
           EXPO_NO_TELEMETRY: 1
         run: |
-          # Run without CI=1 so expo prints the full tunnel URL
           npx expo start --tunnel 2>&1 \
             | sed 's/\x1b\[[0-9;]*[mGKHFJA-Z]//g' \
             | tee /tmp/expo.log &
@@ -51,7 +53,6 @@ jobs:
           for i in $(seq 1 50); do
             sleep 3
 
-            # Method 1: grep log for exp:// URL (non-localhost)
             FOUND=$(grep -oE 'exp://[a-zA-Z0-9._-]+\.[a-zA-Z0-9._-]+' /tmp/expo.log \
                     | grep -v localhost | head -1)
             if [ -n "$FOUND" ]; then
@@ -60,7 +61,6 @@ jobs:
               break
             fi
 
-            # Method 2: ngrok local API
             NGROK=$(curl -s http://localhost:4040/api/tunnels 2>/dev/null \
               | python3 -c "
 import sys,json
@@ -89,13 +89,11 @@ except: pass
             exit 1
           fi
 
-          # QR image
           ENCODED=$(python3 -c \
             "import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1],safe=''))" \
             "$TUNNEL_URL")
           QR_IMG="https://api.qrserver.com/v1/create-qr-code/?size=500x500&ecc=M&data=$ENCODED"
 
-          # Job summary
           echo "## 🏀 Project Ball — Dev Server Running" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "**Scan with Expo Go:**" >> "$GITHUB_STEP_SUMMARY"
@@ -106,7 +104,6 @@ except: pass
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "> Server alive for **${MINUTES} minutes**. First bundle ~60s." >> "$GITHUB_STEP_SUMMARY"
 
-          # ASCII QR + URL in logs
           npx qrcode-terminal "$TUNNEL_URL" || true
           echo "=================================="
           echo "EXPO URL: $TUNNEL_URL"
