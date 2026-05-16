@@ -25,17 +25,17 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '18'
 
-      - name: Install expo CLI and upgrade to SDK 54
+      - name: Install SDK 51 base packages
+        working-directory: project-ball
+        run: npm install --legacy-peer-deps
+
+      - name: Upgrade to Expo SDK 54
         working-directory: project-ball
         run: |
-          npm install
           npm install expo@~54.0.0 --legacy-peer-deps
-          npx expo install react-native react expo-status-bar \
-            react-native-safe-area-context react-native-screens \
-            react-native-svg @react-native-async-storage/async-storage \
-            --legacy-peer-deps
+          npx expo install react-native react expo-status-bar react-native-safe-area-context react-native-screens react-native-svg @react-native-async-storage/async-storage --legacy-peer-deps
 
       - name: Install Expo ngrok
         run: npm install -g @expo/ngrok@^4.1.0
@@ -60,7 +60,7 @@ jobs:
               break
             fi
 
-            NGROK_URL=$(curl -sf http://localhost:4040/api/tunnels 2>/dev/null | python3 -c "import sys,json; d=json.load(sys.stdin); print(next((t['public_url'] for t in d.get('tunnels',[]) if t.get('public_url')),'')); " 2>/dev/null || true)
+            NGROK_URL=$(curl -sf http://localhost:4040/api/tunnels 2>/dev/null | python3 -c "import sys,json; d=json.load(sys.stdin); print(next((t['public_url'] for t in d.get('tunnels',[]) if t.get('public_url')),''))" 2>/dev/null || true)
             if [ -n "$NGROK_URL" ]; then
               HOST="${NGROK_URL#https://}"; HOST="${HOST#http://}"
               TUNNEL_URL="exp://$HOST"
