@@ -13,7 +13,7 @@ const allDrills = drillsRaw as Drill[];
 const CATEGORIES: { value: DrillCategory | 'all'; label: string }[] = [
   { value: 'all', label: 'All' },
   { value: 'shooting', label: 'Shooting' },
-  { value: 'ball-handling', label: 'Handles' },
+  { value: 'ball-handling', label: 'Ball Handling' },
   { value: 'finishing', label: 'Finishing' },
   { value: 'footwork', label: 'Footwork' },
   { value: 'defense', label: 'Defense' },
@@ -61,6 +61,7 @@ export default function DrillsScreen({ navigation }: any) {
           keyExtractor={(x) => x.value}
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.catRow}
+          ItemSeparatorComponent={() => <View style={{ width: Spacing.sm }} />}
           renderItem={({ item }) => {
             const active = category === item.value;
             return (
@@ -130,7 +131,7 @@ const styles = StyleSheet.create({
     borderColor: Colors.surfaceBorder,
     marginBottom: Spacing.sm,
   },
-  catRow: { paddingHorizontal: Spacing.lg, gap: Spacing.sm, marginBottom: Spacing.sm },
+  catRow: { paddingHorizontal: Spacing.lg, marginBottom: Spacing.sm },
   catChip: {
     paddingHorizontal: 16,
     paddingVertical: 8,

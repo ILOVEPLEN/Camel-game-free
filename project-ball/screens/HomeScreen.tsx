@@ -25,6 +25,7 @@ function greeting(): string {
 export default function HomeScreen({ navigation }: any) {
   const [profile, setProfile] = useState<PlayerProfile | null>(null);
   const [session, setSession] = useState<WorkoutSession | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [completedIds, setCompletedIds] = useState<Set<string>>(new Set());
   const [logModalVisible, setLogModalVisible] = useState(false);
   const [rpe, setRpe] = useState(5);
@@ -32,6 +33,7 @@ export default function HomeScreen({ navigation }: any) {
   const [drillLogs, setDrillLogs] = useState<DrillLog[]>([]);
 
   const loadSession = useCallback(async () => {
+    try {
     const p = await Storage.getProfile();
     if (!p) return;
     setProfile(p);
@@ -67,6 +69,11 @@ export default function HomeScreen({ navigation }: any) {
     const newSession = generateSession(p, multiplier);
     await Storage.setCurrentSession(newSession);
     setSession(newSession);
+    } catch (e) {
+      console.error('loadSession failed', e);
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
   useEffect(() => { loadSession(); }, [loadSession]);
@@ -121,11 +128,24 @@ export default function HomeScreen({ navigation }: any) {
     ]);
   };
 
-  if (!session) {
+  if (isLoading) {
     return (
       <SafeAreaView style={styles.safe}>
         <View style={styles.loading}>
           <Text style={styles.loadingText}>Building your session…</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (!session) {
+    return (
+      <SafeAreaView style={styles.safe}>
+        <View style={styles.loading}>
+          <Text style={styles.loadingText}>Couldn't build a session.</Text>
+          <TouchableOpacity onPress={loadSession} style={{ marginTop: 16 }}>
+            <Text style={{ color: Colors.accent, fontSize: 15, fontWeight: '600' }}>Try again</Text>
+          </TouchableOpacity>
         </View>
       </SafeAreaView>
     );

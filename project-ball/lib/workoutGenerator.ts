@@ -2,9 +2,11 @@ import { PlayerProfile, EquipmentAccess, Goal } from '../types/profile';
 import { WorkoutSession, SessionDrill, SessionBlock } from '../types/workout';
 import { Drill, Equipment, DrillCategory } from '../types/drill';
 import drillsData from '../data/drills.json';
-import { v4 as uuid } from 'uuid';
-
 const allDrills = drillsData as Drill[];
+
+function genId(): string {
+  return `session-${Date.now()}-${Math.floor(Math.random() * 1e9)}`;
+}
 
 const EQUIPMENT_MAP: Record<EquipmentAccess, Equipment[]> = {
   'full-gym': ['ball', 'hoop', 'cones', 'two-balls', 'tennis-ball', 'resistance-band', 'pad', 'barbell', 'dumbbell', 'trap-bar', 'med-ball', 'box', 'none'],
@@ -117,7 +119,7 @@ export function generateSession(
   );
 
   return {
-    id: uuid(),
+    id: genId(),
     date: new Date().toISOString().slice(0, 10),
     drills: sessionDrills,
     estimatedMinutes,
