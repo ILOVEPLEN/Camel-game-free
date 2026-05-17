@@ -1,11 +1,11 @@
 name: 🏀 Project Ball — Dev Server
-# triggered 2026-05-16
+
 on:
   workflow_dispatch:
     inputs:
       minutes:
-        description: 'Minutes to keep server alive (max 30)'
-        default: '20'
+        description: 'Minutes to keep server alive (max 120)'
+        default: '60'
         required: false
   push:
     branches: [main]
@@ -14,7 +14,7 @@ on:
 jobs:
   serve:
     runs-on: ubuntu-latest
-    timeout-minutes: 35
+    timeout-minutes: 125
 
     steps:
       - name: Checkout
@@ -43,7 +43,7 @@ jobs:
       - name: Start server and get URL
         working-directory: project-ball
         env:
-          MINUTES: ${{ github.event.inputs.minutes || '20' }}
+          MINUTES: ${{ github.event.inputs.minutes || '60' }}
           EXPO_NO_TELEMETRY: 1
         run: |
           npx expo start --tunnel 2>&1 | sed 's/\x1b\[[0-9;]*[mGKHFJA-Z]//g' | tee /tmp/expo.log &
