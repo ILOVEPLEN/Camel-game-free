@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
-import { Colors } from '../../theme/colors';
+import { useTheme } from '../../theme/ThemeContext';
 import { Spacing, Radius, Shadow } from '../../theme/spacing';
 
 const DAYS_OPTIONS = [2, 3, 4, 5, 6];
@@ -8,35 +8,41 @@ const DURATION_OPTIONS = [30, 45, 60, 75, 90];
 
 interface Props {
   onNext: (daysPerWeek: number, minutesPerSession: number) => void;
+  stepLabel?: string;
 }
 
-export default function ScheduleScreen({ onNext }: Props) {
+export default function ScheduleScreen({ onNext, stepLabel = '5 of 5' }: Props) {
+  const { colors } = useTheme();
   const [days, setDays] = useState<number | null>(null);
   const [mins, setMins] = useState<number | null>(null);
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
       <View style={styles.container}>
         <View style={styles.header}>
-          <Text style={styles.step}>5 of 5</Text>
-          <Text style={styles.title}>How much time can you commit?</Text>
-          <Text style={styles.subtitle}>We'll build sessions that fit your schedule, not the other way around.</Text>
+          <Text style={[styles.step, { color: colors.accent }]}>{stepLabel}</Text>
+          <Text style={[styles.title, { color: colors.textDark }]}>How much time can you commit?</Text>
+          <Text style={[styles.subtitle, { color: colors.textMid }]}>We'll build sessions that fit your schedule, not the other way around.</Text>
         </View>
 
         <View style={styles.sections}>
           <View>
-            <Text style={styles.sectionLabel}>Days per week</Text>
+            <Text style={[styles.sectionLabel, { color: colors.textDark }]}>Days per week</Text>
             <View style={styles.row}>
               {DAYS_OPTIONS.map((d) => {
                 const active = days === d;
                 return (
                   <TouchableOpacity
                     key={d}
-                    style={[styles.chip, active && styles.chipActive]}
+                    style={[
+                      styles.chip,
+                      { backgroundColor: colors.surface, borderColor: colors.surfaceBorder },
+                      active && { backgroundColor: colors.primary, borderColor: colors.primary },
+                    ]}
                     onPress={() => setDays(d)}
                     activeOpacity={0.8}
                   >
-                    <Text style={[styles.chipText, active && styles.chipTextActive]}>{d}</Text>
+                    <Text style={[styles.chipText, { color: colors.textDark }, active && { color: colors.white }]}>{d}</Text>
                   </TouchableOpacity>
                 );
               })}
@@ -44,18 +50,22 @@ export default function ScheduleScreen({ onNext }: Props) {
           </View>
 
           <View>
-            <Text style={styles.sectionLabel}>Minutes per session</Text>
+            <Text style={[styles.sectionLabel, { color: colors.textDark }]}>Minutes per session</Text>
             <View style={styles.row}>
               {DURATION_OPTIONS.map((m) => {
                 const active = mins === m;
                 return (
                   <TouchableOpacity
                     key={m}
-                    style={[styles.chip, active && styles.chipActive]}
+                    style={[
+                      styles.chip,
+                      { backgroundColor: colors.surface, borderColor: colors.surfaceBorder },
+                      active && { backgroundColor: colors.primary, borderColor: colors.primary },
+                    ]}
                     onPress={() => setMins(m)}
                     activeOpacity={0.8}
                   >
-                    <Text style={[styles.chipText, active && styles.chipTextActive]}>{m}</Text>
+                    <Text style={[styles.chipText, { color: colors.textDark }, active && { color: colors.white }]}>{m}</Text>
                   </TouchableOpacity>
                 );
               })}
@@ -63,9 +73,9 @@ export default function ScheduleScreen({ onNext }: Props) {
           </View>
 
           {days && mins ? (
-            <View style={styles.summary}>
-              <Text style={styles.summaryText}>
-                That's <Text style={styles.summaryHighlight}>{days * mins} minutes</Text> of training per week.{'\n'}
+            <View style={[styles.summary, { backgroundColor: colors.accentLight, borderLeftColor: colors.accent }]}>
+              <Text style={[styles.summaryText, { color: colors.textDark }]}>
+                That's <Text style={[styles.summaryHighlight, { color: colors.primary }]}>{days * mins} minutes</Text> of training per week.{'\n'}
                 Serious players are built on consistency.
               </Text>
             </View>
@@ -73,12 +83,15 @@ export default function ScheduleScreen({ onNext }: Props) {
         </View>
 
         <TouchableOpacity
-          style={[styles.btn, (!days || !mins) && styles.btnDisabled]}
+          style={[
+            styles.btn,
+            { backgroundColor: days && mins ? colors.accent : colors.surfaceBorder },
+          ]}
           onPress={() => days && mins && onNext(days, mins)}
           disabled={!days || !mins}
           activeOpacity={0.85}
         >
-          <Text style={styles.btnText}>Let's Build Your Program</Text>
+          <Text style={[styles.btnText, { color: colors.white }]}>Let's Build Your Program</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -86,44 +99,35 @@ export default function ScheduleScreen({ onNext }: Props) {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: Colors.background },
   container: { flex: 1, paddingHorizontal: Spacing.lg, paddingTop: Spacing.xl, justifyContent: 'space-between' },
   header: { marginBottom: Spacing.xl },
-  step: { fontSize: 13, color: Colors.accent, fontWeight: '600', marginBottom: Spacing.sm },
-  title: { fontSize: 28, fontWeight: '800', color: Colors.textDark, marginBottom: Spacing.sm },
-  subtitle: { fontSize: 15, color: Colors.textMid, lineHeight: 22 },
+  step: { fontSize: 13, fontWeight: '600', marginBottom: Spacing.sm },
+  title: { fontSize: 28, fontWeight: '800', marginBottom: Spacing.sm },
+  subtitle: { fontSize: 15, lineHeight: 22 },
   sections: { flex: 1, gap: Spacing.xl, justifyContent: 'center' },
-  sectionLabel: { fontSize: 16, fontWeight: '700', color: Colors.textDark, marginBottom: Spacing.md },
+  sectionLabel: { fontSize: 16, fontWeight: '700', marginBottom: Spacing.md },
   row: { flexDirection: 'row', gap: Spacing.sm, flexWrap: 'wrap' },
   chip: {
     paddingVertical: 12,
     paddingHorizontal: 20,
     borderRadius: Radius.full,
-    backgroundColor: Colors.surface,
     borderWidth: 2,
-    borderColor: Colors.surfaceBorder,
     ...Shadow.sm,
   },
-  chipActive: { backgroundColor: Colors.primary, borderColor: Colors.primary },
-  chipText: { fontSize: 16, fontWeight: '700', color: Colors.textDark },
-  chipTextActive: { color: Colors.white },
+  chipText: { fontSize: 16, fontWeight: '700' },
   summary: {
-    backgroundColor: Colors.accentLight,
     borderRadius: Radius.lg,
     padding: Spacing.md,
     borderLeftWidth: 4,
-    borderLeftColor: Colors.accent,
   },
-  summaryText: { fontSize: 14, color: Colors.textDark, lineHeight: 22 },
-  summaryHighlight: { fontWeight: '800', color: Colors.primary },
+  summaryText: { fontSize: 14, lineHeight: 22 },
+  summaryHighlight: { fontWeight: '800' },
   btn: {
-    backgroundColor: Colors.accent,
     borderRadius: Radius.md,
     paddingVertical: 16,
     alignItems: 'center',
     marginBottom: Spacing.lg,
     ...Shadow.md,
   },
-  btnDisabled: { backgroundColor: Colors.surfaceBorder },
-  btnText: { color: Colors.white, fontSize: 17, fontWeight: '700' },
+  btnText: { fontSize: 17, fontWeight: '700' },
 });

@@ -1,24 +1,25 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, ScrollView, StyleSheet, SafeAreaView } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
 import { Storage } from '../lib/storage';
 import { WorkoutLog } from '../types/workout';
-import StatCard from '../components/StatCard';
-import { Colors } from '../theme/colors';
+import { useTheme } from '../theme/ThemeContext';
 import { Spacing, Radius, Shadow } from '../theme/spacing';
 
 function computeStreak(logs: WorkoutLog[]): number {
   if (logs.length === 0) return 0;
   const dates = [...new Set(logs.map((l) => l.date))].sort().reverse();
   let streak = 0;
-  let expected = new Date();
+  const expected = new Date();
   expected.setHours(0, 0, 0, 0);
+  let expectedTime = expected.getTime();
   for (const dateStr of dates) {
     const d = new Date(dateStr);
     d.setHours(0, 0, 0, 0);
-    const diff = Math.round((expected.getTime() - d.getTime()) / 86400000);
+    const diff = Math.round((expectedTime - d.getTime()) / 86400000);
     if (diff === 0 || diff === 1) {
       streak++;
-      expected = d;
+      expectedTime = d.getTime();
     } else break;
   }
   return streak;
@@ -65,32 +66,42 @@ function shootingData(logs: WorkoutLog[]): { label: string; pct: number }[] {
     }));
 }
 
-function SimpleBarChart({ data }: { data: { label: string; value: number }[] }) {
-  if (data.length === 0) return <Text style={styles.emptyChart}>No data yet</Text>;
+function SimpleBarChart({ data, barColor, bgColor, labelColor }: {
+  data: { label: string; value: number }[];
+  barColor: string;
+  bgColor: string;
+  labelColor: string;
+}) {
+  if (data.length === 0) return <Text style={[styles.emptyChart, { color: labelColor }]}>No data yet</Text>;
   const max = Math.max(...data.map((d) => d.value), 1);
   return (
     <View style={styles.chartContainer}>
       {data.map((d, i) => (
         <View key={i} style={styles.barGroup}>
-          <View style={styles.barBg}>
-            <View style={[styles.barFill, { height: `${Math.round((d.value / max) * 100)}%` }]} />
+          <View style={[styles.barBg, { backgroundColor: bgColor }]}>
+            <View style={[styles.barFill, { height: `${Math.round((d.value / max) * 100)}%`, backgroundColor: barColor }]} />
           </View>
-          <Text style={styles.barLabel}>{d.label}</Text>
-          <Text style={styles.barValue}>{d.value}m</Text>
+          <Text style={[styles.barLabel, { color: labelColor }]}>{d.label}</Text>
+          <Text style={[styles.barValue, { color: labelColor }]}>{d.value}m</Text>
         </View>
       ))}
     </View>
   );
 }
 
-function ShootingChart({ data }: { data: { label: string; pct: number }[] }) {
-  if (data.length === 0) return <Text style={styles.emptyChart}>Log shooting drills to see trends</Text>;
+function ShootingChart({ data, goodColor, badColor, labelColor }: {
+  data: { label: string; pct: number }[];
+  goodColor: string;
+  badColor: string;
+  labelColor: string;
+}) {
+  if (data.length === 0) return <Text style={[styles.emptyChart, { color: labelColor }]}>Log shooting drills to see trends</Text>;
   return (
     <View style={styles.shootingRow}>
       {data.map((d, i) => (
         <View key={i} style={styles.shootingItem}>
-          <Text style={[styles.shootingPct, d.pct >= 50 ? styles.pctGood : styles.pctBad]}>{d.pct}%</Text>
-          <Text style={styles.shootingDate}>{d.label}</Text>
+          <Text style={[styles.shootingPct, { color: d.pct >= 50 ? goodColor : badColor }]}>{d.pct}%</Text>
+          <Text style={[styles.shootingDate, { color: labelColor }]}>{d.label}</Text>
         </View>
       ))}
     </View>
@@ -98,6 +109,7 @@ function ShootingChart({ data }: { data: { label: string; pct: number }[] }) {
 }
 
 export default function ProgressScreen() {
+  const { colors, isDark } = useTheme();
   const [logs, setLogs] = useState<WorkoutLog[]>([]);
 
   useEffect(() => {
@@ -112,50 +124,76 @@ export default function ProgressScreen() {
   const rpe = avgRpe(logs);
 
   return (
-    <SafeAreaView style={styles.safe}>
-      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-        <Text style={styles.title}>Progress</Text>
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.surface }}>
+      <StatusBar style={isDark ? 'light' : 'dark'} />
+      <ScrollView contentContainerStyle={[styles.scroll, { gap: Spacing.md }]} showsVerticalScrollIndicator={false}>
+        <Text style={[styles.title, { color: colors.textDark }]}>Progress</Text>
 
-        {/* Stats row */}
+        {/* Summary stats row */}
         <View style={styles.statsRow}>
-          <StatCard label="Day Streak" value={streak} unit="days" accent />
-          <StatCard label="Total Workouts" value={total} />
+          <View style={[styles.summaryCard, { backgroundColor: colors.primary }]}>
+            <Text style={styles.summaryValue}>{total}</Text>
+            <Text style={styles.summaryLabel}>Workouts</Text>
+          </View>
+          <View style={[styles.summaryCard, { backgroundColor: colors.background, borderColor: colors.surfaceBorder, borderWidth: 1 }]}>
+            <Text style={[styles.summaryValue, { color: colors.textDark }]}>{volume}<Text style={[styles.summaryUnit, { color: colors.textMid }]}> min</Text></Text>
+            <Text style={[styles.summaryLabel, { color: colors.textMid }]}>Total Volume</Text>
+          </View>
+          <View style={[styles.summaryCard, { backgroundColor: colors.background, borderColor: colors.surfaceBorder, borderWidth: 1 }]}>
+            <Text style={[styles.summaryValue, { color: colors.textDark }]}>{rpe}</Text>
+            <Text style={[styles.summaryLabel, { color: colors.textMid }]}>Avg RPE</Text>
+          </View>
         </View>
-        <View style={styles.statsRow}>
-          <StatCard label="Total Volume" value={volume} unit="min" />
-          <StatCard label="Avg RPE" value={rpe} />
-        </View>
+
+        {streak > 0 && (
+          <View style={[styles.streakBanner, { backgroundColor: colors.primary }]}>
+            <Text style={styles.streakBannerText}>🔥 {streak} day streak — keep it going!</Text>
+          </View>
+        )}
 
         {/* Weekly volume */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Weekly Volume (minutes)</Text>
-          <SimpleBarChart data={weekly} />
+        <View style={[styles.card, { backgroundColor: colors.background }]}>
+          <Text style={[styles.cardTitle, { color: colors.textDark }]}>Weekly Volume (minutes)</Text>
+          <SimpleBarChart
+            data={weekly}
+            barColor={colors.accent}
+            bgColor={colors.surface}
+            labelColor={colors.textLight}
+          />
         </View>
 
         {/* Shooting % */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Shooting % Trend</Text>
-          <ShootingChart data={shooting} />
+        <View style={[styles.card, { backgroundColor: colors.background }]}>
+          <Text style={[styles.cardTitle, { color: colors.textDark }]}>Shooting % Trend</Text>
+          <ShootingChart
+            data={shooting}
+            goodColor={colors.easy}
+            badColor={colors.hard}
+            labelColor={colors.textLight}
+          />
         </View>
 
         {/* Recent logs */}
-        <Text style={styles.sectionTitle}>Recent Sessions</Text>
+        <Text style={[styles.sectionTitle, { color: colors.textDark }]}>Recent Sessions</Text>
         {logs.length === 0 ? (
-          <View style={styles.emptyState}>
-            <Text style={styles.emptyTitle}>No sessions logged yet</Text>
-            <Text style={styles.emptyText}>Complete your first workout on the Home tab to see your progress here.</Text>
+          <View style={[styles.emptyState, { backgroundColor: colors.background }]}>
+            <Text style={[styles.emptyTitle, { color: colors.textDark }]}>No sessions logged yet</Text>
+            <Text style={[styles.emptyText, { color: colors.textMid }]}>Complete your first workout on the Home tab to see your progress here.</Text>
           </View>
         ) : (
           <View style={styles.logList}>
             {[...logs].reverse().slice(0, 10).map((log) => (
-              <View key={log.id} style={styles.logItem}>
+              <View key={log.id} style={[styles.logItem, { backgroundColor: colors.background }]}>
                 <View style={styles.logLeft}>
-                  <Text style={styles.logDate}>{log.date}</Text>
-                  <Text style={styles.logMeta}>{log.durationMinutes} min · {log.drillLogs.length} drills logged</Text>
-                  {log.note ? <Text style={styles.logNote}>{log.note}</Text> : null}
+                  <Text style={[styles.logDate, { color: colors.textDark }]}>{log.date}</Text>
+                  <Text style={[styles.logMeta, { color: colors.textMid }]}>{log.durationMinutes} min · {log.drillLogs.length} drills logged</Text>
+                  {log.note ? <Text style={[styles.logNote, { color: colors.textLight }]}>{log.note}</Text> : null}
                 </View>
-                <View style={[styles.rpeBadge, { backgroundColor: log.rpe >= 8 ? Colors.error : log.rpe <= 4 ? Colors.success : Colors.warning }]}>
-                  <Text style={styles.rpeBadgeText}>RPE {log.rpe}</Text>
+                <View style={[
+                  styles.rpeBadge,
+                  { backgroundColor: log.rpe >= 8 ? colors.hard : log.rpe <= 4 ? colors.easy : colors.medium },
+                ]}>
+                  <Text style={[styles.rpeBadgeText, { color: colors.white }]}>RPE {log.rpe}</Text>
                 </View>
               </View>
             ))}
@@ -167,56 +205,67 @@ export default function ProgressScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: Colors.surface },
-  scroll: { padding: Spacing.lg, gap: Spacing.md, paddingBottom: Spacing.xxl },
-  title: { fontSize: 28, fontWeight: '800', color: Colors.textDark },
-  statsRow: { flexDirection: 'row', gap: Spacing.md },
+  scroll: { padding: Spacing.lg, paddingBottom: Spacing.xxl },
+  title: { fontSize: 28, fontWeight: '800' },
+  statsRow: { flexDirection: 'row', gap: Spacing.sm },
+  summaryCard: {
+    flex: 1,
+    borderRadius: Radius.lg,
+    padding: Spacing.md,
+    alignItems: 'center',
+    gap: 2,
+    ...Shadow.sm,
+  },
+  summaryValue: { fontSize: 24, fontWeight: '800', color: '#FFFFFF' },
+  summaryUnit: { fontSize: 14, fontWeight: '500' },
+  summaryLabel: { fontSize: 11, fontWeight: '500', color: 'rgba(255,255,255,0.8)', textAlign: 'center' },
+  streakBanner: {
+    borderRadius: Radius.lg,
+    padding: Spacing.md,
+    alignItems: 'center',
+  },
+  streakBannerText: { color: '#FFFFFF', fontSize: 15, fontWeight: '700' },
   card: {
-    backgroundColor: Colors.background,
     borderRadius: Radius.xl,
     padding: Spacing.lg,
     gap: Spacing.md,
     ...Shadow.sm,
   },
-  cardTitle: { fontSize: 16, fontWeight: '700', color: Colors.textDark },
+  cardTitle: { fontSize: 16, fontWeight: '700' },
   chartContainer: { flexDirection: 'row', alignItems: 'flex-end', gap: 6, height: 120 },
   barGroup: { flex: 1, alignItems: 'center', gap: 4 },
-  barBg: { flex: 1, width: '100%', backgroundColor: Colors.surface, borderRadius: 4, justifyContent: 'flex-end' },
-  barFill: { backgroundColor: Colors.accent, borderRadius: 4, width: '100%', minHeight: 4 },
-  barLabel: { fontSize: 10, color: Colors.textLight },
-  barValue: { fontSize: 9, color: Colors.textLight },
-  emptyChart: { color: Colors.textLight, fontSize: 14, textAlign: 'center', paddingVertical: Spacing.md },
+  barBg: { flex: 1, width: '100%', borderRadius: 4, justifyContent: 'flex-end' },
+  barFill: { borderRadius: 4, width: '100%', minHeight: 4 },
+  barLabel: { fontSize: 10 },
+  barValue: { fontSize: 9 },
+  emptyChart: { fontSize: 14, textAlign: 'center', paddingVertical: Spacing.md },
   shootingRow: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.md },
   shootingItem: { alignItems: 'center', minWidth: 48 },
   shootingPct: { fontSize: 20, fontWeight: '800' },
-  pctGood: { color: Colors.success },
-  pctBad: { color: Colors.error },
-  shootingDate: { fontSize: 11, color: Colors.textLight, marginTop: 2 },
-  sectionTitle: { fontSize: 18, fontWeight: '700', color: Colors.textDark },
+  shootingDate: { fontSize: 11, marginTop: 2 },
+  sectionTitle: { fontSize: 18, fontWeight: '700' },
   emptyState: {
-    backgroundColor: Colors.background,
     borderRadius: Radius.xl,
     padding: Spacing.xl,
     alignItems: 'center',
     gap: Spacing.sm,
     ...Shadow.sm,
   },
-  emptyTitle: { fontSize: 17, fontWeight: '700', color: Colors.textDark },
-  emptyText: { fontSize: 14, color: Colors.textMid, textAlign: 'center', lineHeight: 20 },
+  emptyTitle: { fontSize: 17, fontWeight: '700' },
+  emptyText: { fontSize: 14, textAlign: 'center', lineHeight: 20 },
   logList: { gap: Spacing.sm },
   logItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: Colors.background,
     borderRadius: Radius.lg,
     padding: Spacing.md,
     gap: Spacing.md,
     ...Shadow.sm,
   },
   logLeft: { flex: 1, gap: 2 },
-  logDate: { fontSize: 14, fontWeight: '700', color: Colors.textDark },
-  logMeta: { fontSize: 12, color: Colors.textMid },
-  logNote: { fontSize: 12, color: Colors.textLight, fontStyle: 'italic', marginTop: 2 },
+  logDate: { fontSize: 14, fontWeight: '700' },
+  logMeta: { fontSize: 12 },
+  logNote: { fontSize: 12, fontStyle: 'italic', marginTop: 2 },
   rpeBadge: { borderRadius: Radius.full, paddingHorizontal: 10, paddingVertical: 4 },
-  rpeBadgeText: { color: Colors.white, fontSize: 12, fontWeight: '700' },
+  rpeBadgeText: { fontSize: 12, fontWeight: '700' },
 });

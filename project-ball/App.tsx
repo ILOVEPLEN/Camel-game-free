@@ -3,54 +3,60 @@ import { View, Text, ActivityIndicator } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { StatusBar } from 'expo-status-bar';
 import { Storage } from './lib/storage';
-import { Colors } from './theme/colors';
+import { ThemeProvider, useTheme } from './theme/ThemeContext';
 import OnboardingNavigator from './screens/onboarding/OnboardingNavigator';
 import HomeScreen from './screens/HomeScreen';
 import DrillsScreen from './screens/DrillsScreen';
 import DrillDetailScreen from './screens/DrillDetailScreen';
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const DrillDetailScreenAny = DrillDetailScreen as any;
 import ProgramsScreen from './screens/ProgramsScreen';
 import ProgressScreen from './screens/ProgressScreen';
 import ProfileScreen from './screens/ProfileScreen';
+import ShotTrackerScreen from './screens/ShotTrackerScreen';
 
 const Tab = createBottomTabNavigator();
 const DrillsStack = createNativeStackNavigator();
+const HomeStack = createNativeStackNavigator();
 
 function DrillsStackNavigator() {
+  const { colors } = useTheme();
   return (
     <DrillsStack.Navigator>
       <DrillsStack.Screen name="DrillList" component={DrillsScreen} options={{ headerShown: false }} />
       <DrillsStack.Screen
         name="DrillDetail"
-        component={DrillDetailScreen}
+        component={DrillDetailScreenAny}
         options={({ route }: any) => ({
           title: (route.params?.drill?.name ?? 'Drill'),
           headerBackTitle: 'Library',
-          headerTintColor: Colors.primary,
+          headerTintColor: colors.primary,
           headerShadowVisible: false,
-          headerStyle: { backgroundColor: Colors.background },
-          headerTitleStyle: { fontWeight: '700', color: Colors.textDark },
+          headerStyle: { backgroundColor: colors.background },
+          headerTitleStyle: { fontWeight: '700', color: colors.textDark },
         })}
       />
     </DrillsStack.Navigator>
   );
 }
 
-const HomeStack = createNativeStackNavigator();
 function HomeStackNavigator({ onReset }: { onReset: () => void }) {
+  const { colors } = useTheme();
   return (
     <HomeStack.Navigator>
       <HomeStack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
       <HomeStack.Screen
         name="DrillDetail"
-        component={DrillDetailScreen}
+        component={DrillDetailScreenAny}
         options={({ route }: any) => ({
           title: (route.params?.drill?.name ?? 'Drill'),
           headerBackTitle: 'Today',
-          headerTintColor: Colors.primary,
+          headerTintColor: colors.primary,
           headerShadowVisible: false,
-          headerStyle: { backgroundColor: Colors.background },
-          headerTitleStyle: { fontWeight: '700', color: Colors.textDark },
+          headerStyle: { backgroundColor: colors.background },
+          headerTitleStyle: { fontWeight: '700', color: colors.textDark },
         })}
       />
     </HomeStack.Navigator>
@@ -61,11 +67,50 @@ const TAB_ICONS: Record<string, string> = {
   Today: '🏠',
   Drills: '📋',
   Programs: '📅',
+  Shots: '🏀',
   Progress: '📊',
   Profile: '👤',
 };
 
-export default function App() {
+function AppNavigator({ onReset }: { onReset: () => void }) {
+  const { colors, isDark } = useTheme();
+
+  return (
+    <NavigationContainer>
+      <StatusBar style={isDark ? 'light' : 'dark'} />
+      <Tab.Navigator
+        screenOptions={({ route }) => ({
+          tabBarIcon: () => <Text style={{ fontSize: 20 }}>{TAB_ICONS[route.name] ?? '○'}</Text>,
+          tabBarActiveTintColor: colors.primary,
+          tabBarInactiveTintColor: colors.textLight,
+          tabBarStyle: {
+            backgroundColor: colors.background,
+            borderTopColor: colors.surfaceBorder,
+            borderTopWidth: 1,
+            paddingBottom: 4,
+            height: 60,
+          },
+          tabBarLabelStyle: { fontSize: 11, fontWeight: '600' },
+          headerShown: false,
+        })}
+      >
+        <Tab.Screen name="Today">
+          {() => <HomeStackNavigator onReset={onReset} />}
+        </Tab.Screen>
+        <Tab.Screen name="Drills" component={DrillsStackNavigator} />
+        <Tab.Screen name="Programs" component={ProgramsScreen} />
+        <Tab.Screen name="Shots" component={ShotTrackerScreen} />
+        <Tab.Screen name="Progress" component={ProgressScreen} />
+        <Tab.Screen name="Profile">
+          {() => <ProfileScreen onReset={onReset} />}
+        </Tab.Screen>
+      </Tab.Navigator>
+    </NavigationContainer>
+  );
+}
+
+function AppRoot() {
+  const { colors, isDark } = useTheme();
   const [ready, setReady] = useState(false);
   const [onboarded, setOnboarded] = useState(false);
 
@@ -79,8 +124,9 @@ export default function App() {
 
   if (!ready) {
     return (
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.background }}>
-        <ActivityIndicator size="large" color={Colors.accent} />
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.background }}>
+        <StatusBar style={isDark ? 'light' : 'dark'} />
+        <ActivityIndicator size="large" color={colors.accent} />
       </View>
     );
   }
@@ -89,34 +135,13 @@ export default function App() {
     return <OnboardingNavigator onComplete={() => setOnboarded(true)} />;
   }
 
+  return <AppNavigator onReset={() => setOnboarded(false)} />;
+}
+
+export default function App() {
   return (
-    <NavigationContainer>
-      <Tab.Navigator
-        screenOptions={({ route }) => ({
-          tabBarIcon: () => <Text style={{ fontSize: 20 }}>{TAB_ICONS[route.name] ?? '○'}</Text>,
-          tabBarActiveTintColor: Colors.primary,
-          tabBarInactiveTintColor: Colors.textLight,
-          tabBarStyle: {
-            backgroundColor: Colors.background,
-            borderTopColor: Colors.surfaceBorder,
-            borderTopWidth: 1,
-            paddingBottom: 4,
-            height: 60,
-          },
-          tabBarLabelStyle: { fontSize: 11, fontWeight: '600' },
-          headerShown: false,
-        })}
-      >
-        <Tab.Screen name="Today">
-          {() => <HomeStackNavigator onReset={() => setOnboarded(false)} />}
-        </Tab.Screen>
-        <Tab.Screen name="Drills" component={DrillsStackNavigator} />
-        <Tab.Screen name="Programs" component={ProgramsScreen} />
-        <Tab.Screen name="Progress" component={ProgressScreen} />
-        <Tab.Screen name="Profile">
-          {() => <ProfileScreen onReset={() => setOnboarded(false)} />}
-        </Tab.Screen>
-      </Tab.Navigator>
-    </NavigationContainer>
+    <ThemeProvider>
+      <AppRoot />
+    </ThemeProvider>
   );
 }

@@ -1,6 +1,23 @@
-export type ColorSet = typeof LightColors;
+export interface ColorSet {
+  primary: string;
+  accent: string;
+  accentLight: string;
+  background: string;
+  surface: string;
+  surfaceBorder: string;
+  textDark: string;
+  textMid: string;
+  textLight: string;
+  white: string;
+  success: string;
+  warning: string;
+  error: string;
+  easy: string;
+  medium: string;
+  hard: string;
+}
 
-export const LightColors = {
+export const LightColors: ColorSet = {
   primary: '#1E3A8A',
   accent: '#3B82F6',
   accentLight: '#EFF6FF',
@@ -17,7 +34,7 @@ export const LightColors = {
   easy: '#22C55E',
   medium: '#F59E0B',
   hard: '#EF4444',
-} as const;
+};
 
 export const DarkColors: ColorSet = {
   primary: '#3B82F6',

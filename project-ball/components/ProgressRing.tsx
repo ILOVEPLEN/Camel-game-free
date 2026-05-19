@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
-import { Colors } from '../theme/colors';
+import { useTheme } from '../theme/ThemeContext';
 
 interface Props {
   progress: number; // 0-1
@@ -18,6 +18,7 @@ export default function ProgressRing({
   label,
   sublabel,
 }: Props) {
+  const { colors } = useTheme();
   const r = (size - strokeWidth) / 2;
   const cx = size / 2;
   const circumference = 2 * Math.PI * r;
@@ -31,7 +32,7 @@ export default function ProgressRing({
           cy={cx}
           r={r}
           fill="none"
-          stroke={Colors.accentLight}
+          stroke={colors.accentLight}
           strokeWidth={strokeWidth}
         />
         <Circle
@@ -39,7 +40,7 @@ export default function ProgressRing({
           cy={cx}
           r={r}
           fill="none"
-          stroke={Colors.accent}
+          stroke={colors.accent}
           strokeWidth={strokeWidth}
           strokeDasharray={circumference}
           strokeDashoffset={strokeDashoffset}
@@ -48,8 +49,8 @@ export default function ProgressRing({
         />
       </Svg>
       <View style={[styles.center, { width: size, height: size }]}>
-        {label ? <Text style={styles.label}>{label}</Text> : null}
-        {sublabel ? <Text style={styles.sublabel}>{sublabel}</Text> : null}
+        {label ? <Text style={[styles.label, { color: colors.textDark }]}>{label}</Text> : null}
+        {sublabel ? <Text style={[styles.sublabel, { color: colors.textMid }]}>{sublabel}</Text> : null}
       </View>
     </View>
   );
@@ -58,6 +59,6 @@ export default function ProgressRing({
 const styles = StyleSheet.create({
   wrapper: { position: 'relative', alignItems: 'center', justifyContent: 'center' },
   center: { position: 'absolute', alignItems: 'center', justifyContent: 'center' },
-  label: { fontSize: 22, fontWeight: '800', color: Colors.textDark },
-  sublabel: { fontSize: 12, color: Colors.textMid, marginTop: 2 },
+  label: { fontSize: 22, fontWeight: '800' },
+  sublabel: { fontSize: 12, marginTop: 2 },
 });

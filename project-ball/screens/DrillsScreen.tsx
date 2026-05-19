@@ -2,10 +2,11 @@ import React, { useMemo, useState } from 'react';
 import {
   View, Text, FlatList, TextInput, TouchableOpacity, StyleSheet, SafeAreaView,
 } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
 import drillsRaw from '../data/drills.json';
 import { Drill, DrillCategory } from '../types/drill';
 import DrillCard from '../components/DrillCard';
-import { Colors } from '../theme/colors';
+import { useTheme } from '../theme/ThemeContext';
 import { Spacing, Radius } from '../theme/spacing';
 
 const allDrills = drillsRaw as Drill[];
@@ -22,6 +23,7 @@ const CATEGORIES: { value: DrillCategory | 'all'; label: string }[] = [
 ];
 
 export default function DrillsScreen({ navigation }: any) {
+  const { colors, isDark } = useTheme();
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState<DrillCategory | 'all'>('all');
   const [difficulty, setDifficulty] = useState<(1 | 2 | 3)[]>([]);
@@ -41,16 +43,26 @@ export default function DrillsScreen({ navigation }: any) {
     );
   };
 
+  const diffColors = [colors.easy, colors.medium, colors.hard];
+
   return (
-    <SafeAreaView style={styles.safe}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.surface }}>
+      <StatusBar style={isDark ? 'light' : 'dark'} />
       <View style={styles.container}>
-        <Text style={styles.title}>Drill Library</Text>
+        <Text style={[styles.title, { color: colors.textDark }]}>Drill Library</Text>
         <TextInput
-          style={styles.search}
+          style={[
+            styles.search,
+            {
+              backgroundColor: colors.background,
+              borderColor: colors.surfaceBorder,
+              color: colors.textDark,
+            },
+          ]}
           placeholder="Search drills…"
           value={search}
           onChangeText={setSearch}
-          placeholderTextColor={Colors.textLight}
+          placeholderTextColor={colors.textLight}
           clearButtonMode="while-editing"
         />
 
@@ -66,11 +78,17 @@ export default function DrillsScreen({ navigation }: any) {
             const active = category === item.value;
             return (
               <TouchableOpacity
-                style={[styles.catChip, active && styles.catChipActive]}
+                style={[
+                  styles.catChip,
+                  { backgroundColor: colors.background, borderColor: colors.surfaceBorder },
+                  active && { backgroundColor: colors.primary, borderColor: colors.primary },
+                ]}
                 onPress={() => setCategory(item.value)}
                 activeOpacity={0.8}
               >
-                <Text style={[styles.catChipText, active && styles.catChipTextActive]}>{item.label}</Text>
+                <Text style={[styles.catChipText, { color: colors.textMid }, active && { color: colors.white }]}>
+                  {item.label}
+                </Text>
               </TouchableOpacity>
             );
           }}
@@ -80,55 +98,72 @@ export default function DrillsScreen({ navigation }: any) {
         <View style={styles.diffRow}>
           {([1, 2, 3] as const).map((n) => {
             const labels = ['Beginner', 'Intermediate', 'Advanced'];
-            const colors = [Colors.easy, Colors.medium, Colors.hard];
             const active = difficulty.includes(n);
             return (
               <TouchableOpacity
                 key={n}
-                style={[styles.diffChip, active && { backgroundColor: colors[n - 1], borderColor: colors[n - 1] }]}
+                style={[
+                  styles.diffChip,
+                  { backgroundColor: colors.background, borderColor: colors.surfaceBorder },
+                  active && { backgroundColor: diffColors[n - 1], borderColor: diffColors[n - 1] },
+                ]}
                 onPress={() => toggleDiff(n)}
                 activeOpacity={0.8}
               >
-                <Text style={[styles.diffChipText, active && styles.diffChipTextActive]}>{labels[n - 1]}</Text>
+                <Text style={[styles.diffChipText, { color: colors.textMid }, active && { color: colors.white }]}>
+                  {labels[n - 1]}
+                </Text>
               </TouchableOpacity>
             );
           })}
         </View>
 
-        <Text style={styles.count}>{filtered.length} drills</Text>
+        <Text style={[styles.count, { color: colors.textLight }]}>{filtered.length} drills</Text>
 
-        <FlatList
-          data={filtered}
-          keyExtractor={(d) => d.id}
-          contentContainerStyle={styles.list}
-          showsVerticalScrollIndicator={false}
-          renderItem={({ item }) => (
-            <DrillCard
-              drill={item}
-              onPress={() => navigation.navigate('DrillDetail', { drill: item })}
-            />
-          )}
-          ItemSeparatorComponent={() => <View style={{ height: Spacing.sm }} />}
-        />
+        {filtered.length === 0 ? (
+          <View style={[styles.emptyState, { backgroundColor: colors.background }]}>
+            <Text style={styles.emptyEmoji}>🔍</Text>
+            <Text style={[styles.emptyTitle, { color: colors.textDark }]}>No drills found</Text>
+            <Text style={[styles.emptyText, { color: colors.textMid }]}>
+              Try adjusting your filters or search term.
+            </Text>
+            <TouchableOpacity
+              style={[styles.clearBtn, { backgroundColor: colors.accentLight }]}
+              onPress={() => { setSearch(''); setCategory('all'); setDifficulty([]); }}
+            >
+              <Text style={[styles.clearBtnText, { color: colors.primary }]}>Clear Filters</Text>
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <FlatList
+            data={filtered}
+            keyExtractor={(d) => d.id}
+            contentContainerStyle={styles.list}
+            showsVerticalScrollIndicator={false}
+            renderItem={({ item }) => (
+              <DrillCard
+                drill={item}
+                onPress={() => navigation.navigate('DrillDetail', { drill: item })}
+              />
+            )}
+            ItemSeparatorComponent={() => <View style={{ height: Spacing.sm }} />}
+          />
+        )}
       </View>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: Colors.surface },
   container: { flex: 1, paddingTop: Spacing.lg },
-  title: { fontSize: 28, fontWeight: '800', color: Colors.textDark, paddingHorizontal: Spacing.lg, marginBottom: Spacing.md },
+  title: { fontSize: 28, fontWeight: '800', paddingHorizontal: Spacing.lg, marginBottom: Spacing.md },
   search: {
     marginHorizontal: Spacing.lg,
-    backgroundColor: Colors.background,
     borderRadius: Radius.md,
     paddingHorizontal: Spacing.md,
     paddingVertical: 10,
     fontSize: 15,
-    color: Colors.textDark,
     borderWidth: 1,
-    borderColor: Colors.surfaceBorder,
     marginBottom: Spacing.sm,
   },
   catRow: { paddingHorizontal: Spacing.lg, marginBottom: Spacing.sm },
@@ -136,25 +171,35 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: Radius.full,
-    backgroundColor: Colors.background,
     borderWidth: 1.5,
-    borderColor: Colors.surfaceBorder,
   },
-  catChipActive: { backgroundColor: Colors.primary, borderColor: Colors.primary },
-  catChipText: { fontSize: 13, fontWeight: '600', color: Colors.textMid },
-  catChipTextActive: { color: Colors.white },
+  catChipText: { fontSize: 13, fontWeight: '600' },
   diffRow: { flexDirection: 'row', gap: Spacing.sm, paddingHorizontal: Spacing.lg, marginBottom: Spacing.sm },
   diffChip: {
     flex: 1,
     alignItems: 'center',
     paddingVertical: 7,
     borderRadius: Radius.full,
-    backgroundColor: Colors.background,
     borderWidth: 1.5,
-    borderColor: Colors.surfaceBorder,
   },
-  diffChipText: { fontSize: 12, fontWeight: '600', color: Colors.textMid },
-  diffChipTextActive: { color: Colors.white },
-  count: { fontSize: 13, color: Colors.textLight, paddingHorizontal: Spacing.lg, marginBottom: Spacing.sm },
+  diffChipText: { fontSize: 12, fontWeight: '600' },
+  count: { fontSize: 13, paddingHorizontal: Spacing.lg, marginBottom: Spacing.sm },
   list: { paddingHorizontal: Spacing.lg, paddingBottom: Spacing.xxl },
+  emptyState: {
+    margin: Spacing.lg,
+    borderRadius: Radius.xl,
+    padding: Spacing.xl,
+    alignItems: 'center',
+    gap: Spacing.sm,
+  },
+  emptyEmoji: { fontSize: 40 },
+  emptyTitle: { fontSize: 18, fontWeight: '700' },
+  emptyText: { fontSize: 14, textAlign: 'center', lineHeight: 20 },
+  clearBtn: {
+    marginTop: Spacing.sm,
+    borderRadius: Radius.full,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+  },
+  clearBtnText: { fontSize: 14, fontWeight: '700' },
 });

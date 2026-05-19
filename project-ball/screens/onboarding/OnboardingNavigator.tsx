@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { PlayerProfile, Position, SkillLevel, Goal, EquipmentAccess } from '../../types/profile';
 import { Storage } from '../../lib/storage';
+import NameScreen from './NameScreen';
 import PositionScreen from './PositionScreen';
 import SkillScreen from './SkillScreen';
 import GoalsScreen from './GoalsScreen';
@@ -12,6 +13,7 @@ interface Props {
 }
 
 export interface DraftProfile {
+  name?: string;
   position?: Position;
   skillLevel?: SkillLevel;
   goals?: Goal[];
@@ -38,9 +40,10 @@ export default function OnboardingNavigator({ onComplete }: Props) {
     onComplete();
   };
 
-  if (step === 0) return <PositionScreen onNext={(position) => next({ position })} />;
-  if (step === 1) return <SkillScreen onNext={(skillLevel) => next({ skillLevel })} />;
-  if (step === 2) return <GoalsScreen onNext={(goals) => next({ goals })} />;
-  if (step === 3) return <EquipmentScreen onNext={(equipmentAccess) => next({ equipmentAccess })} />;
-  return <ScheduleScreen onNext={(days, mins) => finish({ daysPerWeek: days, minutesPerSession: mins })} />;
+  if (step === 0) return <NameScreen onNext={(name) => next({ name })} />;
+  if (step === 1) return <PositionScreen onNext={(position) => next({ position })} stepLabel="2 of 6" />;
+  if (step === 2) return <SkillScreen onNext={(skillLevel) => next({ skillLevel })} stepLabel="3 of 6" />;
+  if (step === 3) return <GoalsScreen onNext={(goals) => next({ goals })} stepLabel="4 of 6" />;
+  if (step === 4) return <EquipmentScreen onNext={(equipmentAccess) => next({ equipmentAccess })} stepLabel="5 of 6" />;
+  return <ScheduleScreen onNext={(days, mins) => finish({ daysPerWeek: days, minutesPerSession: mins })} stepLabel="6 of 6" />;
 }

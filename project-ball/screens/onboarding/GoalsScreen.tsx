@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
-import { Colors } from '../../theme/colors';
+import { useTheme } from '../../theme/ThemeContext';
 import { Spacing, Radius, Shadow } from '../../theme/spacing';
 import { Goal } from '../../types/profile';
 
@@ -14,9 +14,11 @@ const GOALS: { value: Goal; label: string; desc: string; icon: string }[] = [
 
 interface Props {
   onNext: (goals: Goal[]) => void;
+  stepLabel?: string;
 }
 
-export default function GoalsScreen({ onNext }: Props) {
+export default function GoalsScreen({ onNext, stepLabel = '3 of 5' }: Props) {
+  const { colors } = useTheme();
   const [selected, setSelected] = useState<Goal[]>([]);
 
   const toggle = (g: Goal) => {
@@ -28,12 +30,12 @@ export default function GoalsScreen({ onNext }: Props) {
   };
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
       <View style={styles.container}>
         <View style={styles.header}>
-          <Text style={styles.step}>3 of 5</Text>
-          <Text style={styles.title}>What are your goals?</Text>
-          <Text style={styles.subtitle}>Pick up to 3. Your daily workouts will prioritize these areas.</Text>
+          <Text style={[styles.step, { color: colors.accent }]}>{stepLabel}</Text>
+          <Text style={[styles.title, { color: colors.textDark }]}>What are your goals?</Text>
+          <Text style={[styles.subtitle, { color: colors.textMid }]}>Pick up to 3. Your daily workouts will prioritize these areas.</Text>
         </View>
 
         <View style={styles.list}>
@@ -43,16 +45,21 @@ export default function GoalsScreen({ onNext }: Props) {
             return (
               <TouchableOpacity
                 key={g.value}
-                style={[styles.card, active && styles.cardActive, disabled && styles.cardDisabled]}
+                style={[
+                  styles.card,
+                  { backgroundColor: colors.surface, borderColor: colors.surfaceBorder },
+                  active && { backgroundColor: colors.accentLight, borderColor: colors.accent },
+                  disabled && styles.cardDisabled,
+                ]}
                 onPress={() => !disabled && toggle(g.value)}
                 activeOpacity={0.8}
               >
                 <Text style={styles.icon}>{g.icon}</Text>
                 <View style={styles.cardText}>
-                  <Text style={[styles.cardLabel, active && styles.cardLabelActive]}>{g.label}</Text>
-                  <Text style={[styles.cardDesc, active && styles.cardDescActive]}>{g.desc}</Text>
+                  <Text style={[styles.cardLabel, { color: colors.textDark }, active && { color: colors.primary }]}>{g.label}</Text>
+                  <Text style={[styles.cardDesc, { color: colors.textMid }, active && { color: colors.textDark }]}>{g.desc}</Text>
                 </View>
-                <View style={[styles.check, active && styles.checkActive]}>
+                <View style={[styles.check, { borderColor: colors.surfaceBorder }, active && { backgroundColor: colors.accent, borderColor: colors.accent }]}>
                   {active && <Text style={styles.checkMark}>✓</Text>}
                 </View>
               </TouchableOpacity>
@@ -61,14 +68,17 @@ export default function GoalsScreen({ onNext }: Props) {
         </View>
 
         <View style={styles.footer}>
-          <Text style={styles.counter}>{selected.length}/3 selected</Text>
+          <Text style={[styles.counter, { color: colors.textMid }]}>{selected.length}/3 selected</Text>
           <TouchableOpacity
-            style={[styles.btn, selected.length === 0 && styles.btnDisabled]}
+            style={[
+              styles.btn,
+              { backgroundColor: selected.length > 0 ? colors.accent : colors.surfaceBorder },
+            ]}
             onPress={() => selected.length > 0 && onNext(selected)}
             disabled={selected.length === 0}
             activeOpacity={0.85}
           >
-            <Text style={styles.btnText}>Continue</Text>
+            <Text style={[styles.btnText, { color: colors.white }]}>Continue</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -77,52 +87,42 @@ export default function GoalsScreen({ onNext }: Props) {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: Colors.background },
   container: { flex: 1, paddingHorizontal: Spacing.lg, paddingTop: Spacing.xl, justifyContent: 'space-between' },
   header: { marginBottom: Spacing.lg },
-  step: { fontSize: 13, color: Colors.accent, fontWeight: '600', marginBottom: Spacing.sm },
-  title: { fontSize: 28, fontWeight: '800', color: Colors.textDark, marginBottom: Spacing.sm },
-  subtitle: { fontSize: 15, color: Colors.textMid, lineHeight: 22 },
+  step: { fontSize: 13, fontWeight: '600', marginBottom: Spacing.sm },
+  title: { fontSize: 28, fontWeight: '800', marginBottom: Spacing.sm },
+  subtitle: { fontSize: 15, lineHeight: 22 },
   list: { flex: 1, gap: Spacing.sm, justifyContent: 'center' },
   card: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: Colors.surface,
     borderRadius: Radius.lg,
     padding: Spacing.md,
     borderWidth: 2,
-    borderColor: Colors.surfaceBorder,
     gap: Spacing.md,
     ...Shadow.sm,
   },
-  cardActive: { backgroundColor: Colors.accentLight, borderColor: Colors.accent },
   cardDisabled: { opacity: 0.4 },
   icon: { fontSize: 26 },
   cardText: { flex: 1 },
-  cardLabel: { fontSize: 16, fontWeight: '700', color: Colors.textDark },
-  cardLabelActive: { color: Colors.primary },
-  cardDesc: { fontSize: 12, color: Colors.textMid, marginTop: 2 },
-  cardDescActive: { color: Colors.textDark },
+  cardLabel: { fontSize: 16, fontWeight: '700' },
+  cardDesc: { fontSize: 12, marginTop: 2 },
   check: {
     width: 24,
     height: 24,
     borderRadius: 12,
     borderWidth: 2,
-    borderColor: Colors.surfaceBorder,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  checkActive: { backgroundColor: Colors.accent, borderColor: Colors.accent },
-  checkMark: { color: Colors.white, fontSize: 14, fontWeight: '700' },
+  checkMark: { color: '#FFFFFF', fontSize: 14, fontWeight: '700' },
   footer: { marginBottom: Spacing.lg, gap: Spacing.sm },
-  counter: { textAlign: 'center', color: Colors.textMid, fontSize: 14, fontWeight: '600' },
+  counter: { textAlign: 'center', fontSize: 14, fontWeight: '600' },
   btn: {
-    backgroundColor: Colors.accent,
     borderRadius: Radius.md,
     paddingVertical: 16,
     alignItems: 'center',
     ...Shadow.md,
   },
-  btnDisabled: { backgroundColor: Colors.surfaceBorder },
-  btnText: { color: Colors.white, fontSize: 17, fontWeight: '700' },
+  btnText: { fontSize: 17, fontWeight: '700' },
 });

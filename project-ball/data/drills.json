@@ -1049,5 +1049,820 @@
     ],
     "videoPlaceholder": "https://placehold.co/640x360?text=Calf+Raises",
     "description": "Calf and Achilles tendon strength. Critical for jump height and ankle injury prevention."
+  },
+  {
+    "id": "shoot-13",
+    "name": "Kevin Durant Mid-Range Series",
+    "category": "shooting",
+    "difficulty": 2,
+    "equipment": ["ball", "hoop"],
+    "duration": 12,
+    "targetReps": 40,
+    "cues": [
+      "Use your height — shoot over the defense",
+      "Quick, high release with consistent touch",
+      "Attack the high post, receive and shoot",
+      "Fade slightly when defender is close"
+    ],
+    "videoPlaceholder": "https://placehold.co/640x360?text=KD+Mid+Range",
+    "description": "High-post and elbow mid-range series. Develop the signature KD fadeaway and straight-line pull-up."
+  },
+  {
+    "id": "shoot-14",
+    "name": "Shooting Off the Dribble Handoff",
+    "category": "shooting",
+    "difficulty": 2,
+    "equipment": ["ball", "hoop", "cones"],
+    "duration": 10,
+    "targetReps": 35,
+    "cues": [
+      "Attack the handoff aggressively, don't drift",
+      "Use your body to rip through the handoff",
+      "Be ready to shoot or drive based on defense",
+      "Footwork must be a 1-2 step into the shot"
+    ],
+    "videoPlaceholder": "https://placehold.co/640x360?text=DHO+Shooting",
+    "description": "Simulate dribble hand-off (DHO) actions with cones. Builds catching in traffic and quick-release skills."
+  },
+  {
+    "id": "shoot-15",
+    "name": "Spot Up Shooting — 5 Spots",
+    "category": "shooting",
+    "difficulty": 1,
+    "equipment": ["ball", "hoop"],
+    "duration": 15,
+    "targetReps": 50,
+    "cues": [
+      "Establish your base before the catch",
+      "Hip rotation initiates the shot",
+      "Same pre-shot routine every time",
+      "Track your make percentage at each spot"
+    ],
+    "videoPlaceholder": "https://placehold.co/640x360?text=Spot+Up+5+Spots",
+    "description": "5 spots around the arc: corners, wings, and top. The foundation of any shooting workout."
+  },
+  {
+    "id": "shoot-16",
+    "name": "Shooting on the Move — Curl Cuts",
+    "category": "shooting",
+    "difficulty": 2,
+    "equipment": ["ball", "hoop", "cones"],
+    "duration": 12,
+    "targetReps": 30,
+    "cues": [
+      "Curl tight around the cone (screen)",
+      "Eyes to the passer as you come off",
+      "Catch and square up in one fluid motion",
+      "Shoot off the curl, not after drifting"
+    ],
+    "videoPlaceholder": "https://placehold.co/640x360?text=Curl+Cut+Shooting",
+    "description": "Simulate curling off screens with cone routes. Essential for off-ball players."
+  },
+  {
+    "id": "shoot-17",
+    "name": "Mikan Drill",
+    "category": "shooting",
+    "difficulty": 1,
+    "equipment": ["ball", "hoop"],
+    "duration": 8,
+    "targetReps": 40,
+    "cues": [
+      "Use the backboard on both sides",
+      "Soft touch — don't power the ball in",
+      "Alternate sides with no wasted steps",
+      "Work on weak hand exclusively if needed"
+    ],
+    "videoPlaceholder": "https://placehold.co/640x360?text=Mikan+Drill",
+    "description": "Alternating layups on each side of the rim. Builds soft hands and interior scoring touch."
+  },
+  {
+    "id": "shoot-18",
+    "name": "Post Fade and Drop Step",
+    "category": "shooting",
+    "difficulty": 3,
+    "equipment": ["ball", "hoop"],
+    "duration": 12,
+    "targetReps": 20,
+    "cues": [
+      "Establish deep post position first",
+      "Read the defense before making your move",
+      "Fade: create distance, stay balanced",
+      "Drop step: two quick power dribbles, strong finish"
+    ],
+    "videoPlaceholder": "https://placehold.co/640x360?text=Post+Moves",
+    "description": "Post scoring fundamentals: fade-away jumper and drop step power move."
+  },
+  {
+    "id": "handle-11",
+    "name": "Figure-8 Dribbling",
+    "category": "ball-handling",
+    "difficulty": 1,
+    "equipment": ["ball"],
+    "duration": 8,
+    "cues": [
+      "Keep the ball below knee height",
+      "Quick hands — don't let the ball sit",
+      "Low athletic stance throughout",
+      "Speed up each set to improve"
+    ],
+    "videoPlaceholder": "https://placehold.co/640x360?text=Figure+8+Dribble",
+    "description": "Weave the ball in a figure-8 around your legs. Builds ambidextrous handle and coordination."
+  },
+  {
+    "id": "handle-12",
+    "name": "Dribble Attack Series",
+    "category": "ball-handling",
+    "difficulty": 2,
+    "equipment": ["ball", "cones"],
+    "duration": 12,
+    "cues": [
+      "Explode into each move like it's a defender",
+      "Change of pace before the move",
+      "Protect the ball with your body on attacks",
+      "Finish at the rim each time"
+    ],
+    "videoPlaceholder": "https://placehold.co/640x360?text=Dribble+Attack",
+    "description": "5-cone attack series: crossover, between legs, behind back, spin, hesitation."
+  },
+  {
+    "id": "handle-13",
+    "name": "Tennis Ball Dribbling",
+    "category": "ball-handling",
+    "difficulty": 2,
+    "equipment": ["ball", "tennis-ball"],
+    "duration": 10,
+    "cues": [
+      "Catch the tennis ball before it hits ground",
+      "Never look down at the basketball",
+      "Throw tennis ball to yourself at different heights",
+      "Focus eyes at horizon level"
+    ],
+    "videoPlaceholder": "https://placehold.co/640x360?text=Tennis+Ball+Dribble",
+    "description": "Dribble a basketball while catching/throwing a tennis ball. Trains heads-up dribbling."
+  },
+  {
+    "id": "handle-14",
+    "name": "Two-Ball Dribbling",
+    "category": "ball-handling",
+    "difficulty": 3,
+    "equipment": ["two-balls"],
+    "duration": 12,
+    "cues": [
+      "Both balls bounce simultaneously at first",
+      "Alternate the bounces when comfortable",
+      "Keep both balls at equal height",
+      "Never let either ball die — constant motion"
+    ],
+    "videoPlaceholder": "https://placehold.co/640x360?text=Two+Ball+Dribbling",
+    "description": "Dribble two basketballs simultaneously — same time and alternating. Builds elite ambidextrous control."
+  },
+  {
+    "id": "handle-15",
+    "name": "Hesitation (Hesi) Move",
+    "category": "ball-handling",
+    "difficulty": 2,
+    "equipment": ["ball", "cones"],
+    "duration": 10,
+    "cues": [
+      "Slow down before the hesi to freeze defender",
+      "Reset your weight back, then explode forward",
+      "Show the ball slightly — bait the reach",
+      "Drive past them low and fast"
+    ],
+    "videoPlaceholder": "https://placehold.co/640x360?text=Hesitation+Move",
+    "description": "Master the hesitation dribble to freeze defenders. One of the most effective moves off the dribble."
+  },
+  {
+    "id": "handle-16",
+    "name": "Between the Legs Combo",
+    "category": "ball-handling",
+    "difficulty": 2,
+    "equipment": ["ball"],
+    "duration": 10,
+    "cues": [
+      "Stay low — bent knees throughout",
+      "Push the ball through, don't flip it",
+      "Front-back foot position for each between-legs",
+      "Chain into crossovers and behind-the-back"
+    ],
+    "videoPlaceholder": "https://placehold.co/640x360?text=BTL+Combo",
+    "description": "Between-the-legs combination moves. Build the confidence to execute under pressure."
+  },
+  {
+    "id": "handle-17",
+    "name": "Chair Dribbling Series",
+    "category": "ball-handling",
+    "difficulty": 2,
+    "equipment": ["ball", "cones"],
+    "duration": 10,
+    "cues": [
+      "Use cones as defenders — react to them",
+      "Read the cone: go left or right based on position",
+      "Push the pace — move at game speed",
+      "Use a different move at each cone"
+    ],
+    "videoPlaceholder": "https://placehold.co/640x360?text=Chair+Dribble",
+    "description": "Navigate through 4-5 cones using different dribble moves. Simulates game-like decision-making."
+  },
+  {
+    "id": "finish-09",
+    "name": "Euro Step Layup",
+    "category": "finishing",
+    "difficulty": 2,
+    "equipment": ["ball", "hoop", "cones"],
+    "duration": 10,
+    "targetReps": 20,
+    "cues": [
+      "Gather on one side, step wide to the other",
+      "Use your body to shield the ball from defenders",
+      "Go up off the outside foot",
+      "Soft release at the top of your jump"
+    ],
+    "videoPlaceholder": "https://placehold.co/640x360?text=Euro+Step",
+    "description": "Two-step lateral finishing move to avoid shot-blockers. Master both left and right."
+  },
+  {
+    "id": "finish-10",
+    "name": "Floater Finish",
+    "category": "finishing",
+    "difficulty": 2,
+    "equipment": ["ball", "hoop"],
+    "duration": 10,
+    "targetReps": 30,
+    "cues": [
+      "Release the ball before reaching the rim",
+      "Use your wrist and fingertips — gentle touch",
+      "Slight arc — not flat, not too high",
+      "Practice from 8-14 feet on both sides"
+    ],
+    "videoPlaceholder": "https://placehold.co/640x360?text=Floater+Finish",
+    "description": "The teardrop floater over big defenders. Essential for guards and wings driving the lane."
+  },
+  {
+    "id": "finish-11",
+    "name": "Reverse Layup",
+    "category": "finishing",
+    "difficulty": 2,
+    "equipment": ["ball", "hoop"],
+    "duration": 10,
+    "targetReps": 20,
+    "cues": [
+      "Go under the basket, flip from the other side",
+      "Use the rim as a protector from shot-blockers",
+      "Soft touch — let the backboard help",
+      "Inside hand for reverse, off the glass"
+    ],
+    "videoPlaceholder": "https://placehold.co/640x360?text=Reverse+Layup",
+    "description": "Finishing from below the rim using the backboard for protection. Hard to block when done correctly."
+  },
+  {
+    "id": "finish-12",
+    "name": "Up-and-Under Move",
+    "category": "finishing",
+    "difficulty": 3,
+    "equipment": ["ball", "hoop"],
+    "duration": 10,
+    "targetReps": 15,
+    "cues": [
+      "Show the ball high to make defender jump",
+      "Step through as they commit",
+      "Go up strong with two feet when possible",
+      "Sell the first fake completely"
+    ],
+    "videoPlaceholder": "https://placehold.co/640x360?text=Up+and+Under",
+    "description": "Fake a shot, draw the block attempt, step through for the easy finish. A classic post move."
+  },
+  {
+    "id": "finish-13",
+    "name": "Contact Finishing",
+    "category": "finishing",
+    "difficulty": 3,
+    "equipment": ["ball", "hoop", "pad"],
+    "duration": 12,
+    "targetReps": 20,
+    "cues": [
+      "Attack through contact — don't fade away",
+      "Absorb the hit in your core and legs",
+      "Stay strong — don't let contact kill momentum",
+      "Finish high and strong through the bump"
+    ],
+    "videoPlaceholder": "https://placehold.co/640x360?text=Contact+Finishing",
+    "description": "Practice absorbing contact and still finishing at the rim. Use a pad or partner to simulate defenders."
+  },
+  {
+    "id": "foot-07",
+    "name": "Drop Step Footwork",
+    "category": "footwork",
+    "difficulty": 2,
+    "equipment": ["ball", "cones"],
+    "duration": 10,
+    "cues": [
+      "Pivot on your pivot foot, swing leg drops wide",
+      "Get low on the drop — create a wide base",
+      "Power dribble before the finish",
+      "Practice from both sides of the post"
+    ],
+    "videoPlaceholder": "https://placehold.co/640x360?text=Drop+Step+Footwork",
+    "description": "The drop step footwork pattern. Used in the post and high-low game to gain position."
+  },
+  {
+    "id": "foot-08",
+    "name": "L-Cut Footwork",
+    "category": "footwork",
+    "difficulty": 1,
+    "equipment": ["cones"],
+    "duration": 8,
+    "cues": [
+      "Plant hard on the direction-change foot",
+      "Cut at 90 degrees — not a rounded curve",
+      "Explode off the cut like sprinting",
+      "Hands ready for the pass as you come free"
+    ],
+    "videoPlaceholder": "https://placehold.co/640x360?text=L+Cut+Footwork",
+    "description": "The L-cut for receiving passes. Sharp cuts create separation from defenders."
+  },
+  {
+    "id": "foot-09",
+    "name": "Three-Threat Position Drills",
+    "category": "footwork",
+    "difficulty": 1,
+    "equipment": ["ball"],
+    "duration": 8,
+    "cues": [
+      "Ball in shot pocket — ready to shoot, pass, or drive",
+      "Slight shoulder fake to test the defense",
+      "Low center of gravity — bounce on your toes",
+      "Eyes on the rim, use peripheral vision for defense"
+    ],
+    "videoPlaceholder": "https://placehold.co/640x360?text=Three+Threat",
+    "description": "Establish and read from the triple-threat position. Every catch should start here."
+  },
+  {
+    "id": "foot-10",
+    "name": "Swing Step and Drive",
+    "category": "footwork",
+    "difficulty": 2,
+    "equipment": ["ball", "cones"],
+    "duration": 10,
+    "cues": [
+      "Jab step to probe the defender",
+      "If they don't react, cross and go",
+      "Keep the jab low and out",
+      "Drive with purpose — straight to the rim"
+    ],
+    "videoPlaceholder": "https://placehold.co/640x360?text=Swing+Step+Drive",
+    "description": "Jab step series with drive finishes. The most fundamental 1v1 footwork pattern."
+  },
+  {
+    "id": "foot-11",
+    "name": "Pivot Work",
+    "category": "footwork",
+    "difficulty": 1,
+    "equipment": ["ball"],
+    "duration": 8,
+    "cues": [
+      "Keep pivot foot grounded — no traveling",
+      "Swing on the ball of your foot",
+      "Use front and reverse pivots to create angles",
+      "Keep ball protected during the pivot"
+    ],
+    "videoPlaceholder": "https://placehold.co/640x360?text=Pivot+Work",
+    "description": "Front and reverse pivots to create passing and shooting angles. Footwork fundamentals."
+  },
+  {
+    "id": "def-06",
+    "name": "Closeout Footwork",
+    "category": "defense",
+    "difficulty": 2,
+    "equipment": ["cones"],
+    "duration": 10,
+    "cues": [
+      "Sprint to half-distance, then chop steps",
+      "Hands up — contest without leaving feet",
+      "Land in a defensive stance, ready to slide",
+      "Don't fly by — controlled closeout"
+    ],
+    "videoPlaceholder": "https://placehold.co/640x360?text=Closeout+Footwork",
+    "description": "Sprint and chop-step closeout to an imaginary shooter. Most important defensive skill."
+  },
+  {
+    "id": "def-07",
+    "name": "On-Ball Defensive Slides",
+    "category": "defense",
+    "difficulty": 1,
+    "equipment": ["none"],
+    "duration": 10,
+    "cues": [
+      "Stay in a wide, low stance",
+      "Push off the outside foot to slide",
+      "Feet never cross — step-slide pattern",
+      "Keep your nose on the ball"
+    ],
+    "videoPlaceholder": "https://placehold.co/640x360?text=Defensive+Slides",
+    "description": "Lateral defensive footwork drill. Foundation of perimeter defense."
+  },
+  {
+    "id": "def-08",
+    "name": "Help-Side Rotations",
+    "category": "defense",
+    "difficulty": 2,
+    "equipment": ["cones"],
+    "duration": 12,
+    "cues": [
+      "Open stance — see ball and your man simultaneously",
+      "React to ball movement with active feet",
+      "Communicate 'help' or 'deny' verbally",
+      "Sprint to help position before the drive arrives"
+    ],
+    "videoPlaceholder": "https://placehold.co/640x360?text=Help+Side+Defense",
+    "description": "Practice rotating to help-side defensive positions using cones as ball and man markers."
+  },
+  {
+    "id": "def-09",
+    "name": "Block and Contest",
+    "category": "defense",
+    "difficulty": 2,
+    "equipment": ["ball", "hoop"],
+    "duration": 10,
+    "targetReps": 20,
+    "cues": [
+      "Time the jump — don't leave too early",
+      "Go straight up — no swinging arms",
+      "Keep your hand up after missing the block",
+      "Body vertical to avoid fouls"
+    ],
+    "videoPlaceholder": "https://placehold.co/640x360?text=Shot+Contest",
+    "description": "Practice contesting shots by jumping vertically. Timed on-ball shot contests."
+  },
+  {
+    "id": "def-10",
+    "name": "Deny Denial Defense",
+    "category": "defense",
+    "difficulty": 2,
+    "equipment": ["ball", "cones"],
+    "duration": 10,
+    "cues": [
+      "Hand in the passing lane at all times",
+      "Stay between your man and the ball",
+      "React to back-cuts with instant rotation",
+      "Maintain denial without fouling"
+    ],
+    "videoPlaceholder": "https://placehold.co/640x360?text=Deny+Defense",
+    "description": "Practice denying the ball to a wing player, then recovering on cuts."
+  },
+  {
+    "id": "cond-09",
+    "name": "Suicides (Line Drills)",
+    "category": "conditioning",
+    "difficulty": 2,
+    "equipment": ["none"],
+    "duration": 12,
+    "cues": [
+      "Sprint — not jog — to each line",
+      "Touch the line with your hand",
+      "Turn using the inside foot to plant",
+      "Track your time and compete with it"
+    ],
+    "videoPlaceholder": "https://placehold.co/640x360?text=Suicides",
+    "description": "Classic basketball conditioning drill: sprint to each court line in sequence."
+  },
+  {
+    "id": "cond-10",
+    "name": "17s (Full-Court Sprints)",
+    "category": "conditioning",
+    "difficulty": 3,
+    "equipment": ["none"],
+    "duration": 15,
+    "cues": [
+      "Complete 17 sideline-to-sideline runs in 60 seconds",
+      "Run in a straight line — don't weave",
+      "Touch each sideline before turning",
+      "This is your conditioning benchmark"
+    ],
+    "videoPlaceholder": "https://placehold.co/640x360?text=17s+Sprints",
+    "description": "17 sideline sprints in 60 seconds. The gold standard conditioning test for basketball."
+  },
+  {
+    "id": "cond-11",
+    "name": "3-Man Weave Running",
+    "category": "conditioning",
+    "difficulty": 2,
+    "equipment": ["ball"],
+    "duration": 12,
+    "cues": [
+      "Pass before you cross midline",
+      "Fill the outside lane at full speed",
+      "Catch in stride — no slowing down for the ball",
+      "Finish with a layup each time"
+    ],
+    "videoPlaceholder": "https://placehold.co/640x360?text=3+Man+Weave",
+    "description": "Classic fast-break running drill. Builds conditioning, passing in stride, and finishing."
+  },
+  {
+    "id": "cond-12",
+    "name": "Continuous Jump Rope",
+    "category": "conditioning",
+    "difficulty": 1,
+    "equipment": ["none"],
+    "duration": 10,
+    "cues": [
+      "Stay on the balls of your feet",
+      "Small, quick jumps — not big hops",
+      "Relax shoulders, arms move from wrists",
+      "Breathe rhythmically with your jumps"
+    ],
+    "videoPlaceholder": "https://placehold.co/640x360?text=Jump+Rope",
+    "description": "Continuous rope jumping builds foot speed, rhythm, and aerobic capacity."
+  },
+  {
+    "id": "cond-13",
+    "name": "Defensive Slide Circuit",
+    "category": "conditioning",
+    "difficulty": 2,
+    "equipment": ["cones"],
+    "duration": 15,
+    "cues": [
+      "Defensive stance throughout — no standing up",
+      "Explode laterally at each cone",
+      "Don't let your feet come together",
+      "Finish every rep even when tired"
+    ],
+    "videoPlaceholder": "https://placehold.co/640x360?text=Slide+Circuit",
+    "description": "Defensive slides through a cone pattern. Combines conditioning with defensive footwork."
+  },
+  {
+    "id": "str-12",
+    "name": "Single-Leg Romanian Deadlift",
+    "category": "strength",
+    "difficulty": 2,
+    "equipment": ["dumbbell"],
+    "duration": 12,
+    "targetSets": 3,
+    "targetReps": 10,
+    "cues": [
+      "Hinge at the hip — not a squat",
+      "Keep back flat and hip square",
+      "Feel the stretch in your hamstring",
+      "Control the eccentric — 2-3 seconds down"
+    ],
+    "videoPlaceholder": "https://placehold.co/640x360?text=Single+Leg+RDL",
+    "description": "Unilateral hamstring and hip hinge strength. Addresses left-right imbalances and reduces injury risk."
+  },
+  {
+    "id": "str-13",
+    "name": "Bulgarian Split Squat",
+    "category": "strength",
+    "difficulty": 3,
+    "equipment": ["dumbbell"],
+    "duration": 15,
+    "targetSets": 3,
+    "targetReps": 8,
+    "cues": [
+      "Front foot takes 90% of the load",
+      "Lower until back knee nearly touches",
+      "Keep torso upright — don't lean forward",
+      "Drive through front heel to stand"
+    ],
+    "videoPlaceholder": "https://placehold.co/640x360?text=Bulgarian+Split+Squat",
+    "description": "The most effective single-leg strength exercise. Builds quad and glute power without spine loading."
+  },
+  {
+    "id": "str-14",
+    "name": "Med Ball Rotational Throws",
+    "category": "strength",
+    "difficulty": 2,
+    "equipment": ["med-ball"],
+    "duration": 10,
+    "targetSets": 3,
+    "targetReps": 10,
+    "cues": [
+      "Drive rotation from hips, not arms",
+      "Explosive release — don't hold back",
+      "Catch and control before next rep",
+      "Throw both ways: left and right"
+    ],
+    "videoPlaceholder": "https://placehold.co/640x360?text=Med+Ball+Rotational",
+    "description": "Rotational power training for shot creation, passing velocity, and athletic movement."
+  },
+  {
+    "id": "str-15",
+    "name": "Pull-Ups and Chin-Ups",
+    "category": "strength",
+    "difficulty": 2,
+    "equipment": ["none"],
+    "duration": 12,
+    "targetSets": 4,
+    "targetReps": 8,
+    "cues": [
+      "Full range: dead hang to chin over bar",
+      "No kipping — strict reps only for strength",
+      "Engage lats before pulling",
+      "Control the descent — 2 seconds down"
+    ],
+    "videoPlaceholder": "https://placehold.co/640x360?text=Pull+Ups",
+    "description": "Upper body pulling strength for rebounding, shot-blocking, and overall athleticism."
+  },
+  {
+    "id": "str-16",
+    "name": "Resistance Band Hip Walks",
+    "category": "strength",
+    "difficulty": 1,
+    "equipment": ["resistance-band"],
+    "duration": 10,
+    "targetSets": 3,
+    "targetReps": 20,
+    "cues": [
+      "Band above knees in defensive stance",
+      "Keep tension in the band — step wide",
+      "Never let knees cave inward",
+      "Maintain quarter-squat depth throughout"
+    ],
+    "videoPlaceholder": "https://placehold.co/640x360?text=Band+Hip+Walks",
+    "description": "Glute activation with resistance bands. Prevents knee valgus and improves lateral power."
+  },
+  {
+    "id": "str-17",
+    "name": "Trap Bar Deadlift",
+    "category": "strength",
+    "difficulty": 2,
+    "equipment": ["trap-bar"],
+    "duration": 20,
+    "targetSets": 4,
+    "targetReps": 5,
+    "cues": [
+      "Set your back before lifting — big breath",
+      "Drive through your heels, extend hips and knees together",
+      "Bar stays close to your body throughout",
+      "Full lockout at top — don't hyperextend"
+    ],
+    "videoPlaceholder": "https://placehold.co/640x360?text=Trap+Bar+Deadlift",
+    "description": "The safest and most sport-specific version of the deadlift. Builds total-body strength for basketball."
+  },
+  {
+    "id": "str-18",
+    "name": "Single-Leg Box Jumps",
+    "category": "strength",
+    "difficulty": 3,
+    "equipment": ["box"],
+    "duration": 12,
+    "targetSets": 4,
+    "targetReps": 5,
+    "cues": [
+      "Load on one leg, explode vertically",
+      "Land softly — absorb with bent knee",
+      "Step down, don't jump down",
+      "Rest 30 seconds between each rep"
+    ],
+    "videoPlaceholder": "https://placehold.co/640x360?text=Single+Leg+Box+Jump",
+    "description": "Unilateral explosive power development. Critical for one-foot take-off in layups and dunks."
+  },
+  {
+    "id": "str-19",
+    "name": "Core Anti-Rotation Press",
+    "category": "strength",
+    "difficulty": 2,
+    "equipment": ["resistance-band"],
+    "duration": 10,
+    "targetSets": 3,
+    "targetReps": 12,
+    "cues": [
+      "Band at chest height, perpendicular to it",
+      "Press straight out — resist rotation",
+      "Engage core before pressing",
+      "Hold 2 seconds at full extension"
+    ],
+    "videoPlaceholder": "https://placehold.co/640x360?text=Pallof+Press",
+    "description": "The Pallof press builds rotational core stability. Protects spine and improves athletic bracing."
+  },
+  {
+    "id": "str-20",
+    "name": "Farmer's Carry",
+    "category": "strength",
+    "difficulty": 1,
+    "equipment": ["dumbbell"],
+    "duration": 10,
+    "targetSets": 4,
+    "cues": [
+      "Stand tall — no leaning to either side",
+      "Grip the weight firmly without tensing shoulder",
+      "Breathe steadily with each step",
+      "Walk in a straight line at a controlled pace"
+    ],
+    "videoPlaceholder": "https://placehold.co/640x360?text=Farmers+Carry",
+    "description": "Loaded carry for grip, core, and total-body strength. Build the foundation for all other lifts."
+  },
+  {
+    "id": "cond-14",
+    "name": "Gasser Runs",
+    "category": "conditioning",
+    "difficulty": 3,
+    "equipment": ["none"],
+    "duration": 15,
+    "cues": [
+      "Sprint baseline to baseline and back twice",
+      "Aim for sub-30 seconds each gasser",
+      "Rest 60-90 seconds between reps",
+      "Maintain form even when winded"
+    ],
+    "videoPlaceholder": "https://placehold.co/640x360?text=Gasser+Runs",
+    "description": "Full-court sprint conditioning. Builds anaerobic capacity specific to basketball."
+  },
+  {
+    "id": "foot-12",
+    "name": "Machine Gun Feet",
+    "category": "footwork",
+    "difficulty": 1,
+    "equipment": ["none"],
+    "duration": 8,
+    "cues": [
+      "Fast feet in place — quicker each set",
+      "Stay on balls of feet throughout",
+      "React to coach's signal to change direction",
+      "Keep a slightly forward-leaning athletic stance"
+    ],
+    "videoPlaceholder": "https://placehold.co/640x360?text=Machine+Gun+Feet",
+    "description": "Rapid in-place footwork drill for foot speed and reaction time."
+  },
+  {
+    "id": "def-11",
+    "name": "Shell Drill (Team Defense)",
+    "category": "defense",
+    "difficulty": 3,
+    "equipment": ["ball", "cones"],
+    "duration": 15,
+    "cues": [
+      "All 4 defenders maintain proper spacing",
+      "Ball moves: everyone rotates accordingly",
+      "Communicate every movement out loud",
+      "On-ball defender: make the ball handler uncomfortable"
+    ],
+    "videoPlaceholder": "https://placehold.co/640x360?text=Shell+Drill",
+    "description": "4v4 defensive positioning drill. The standard team defense development exercise."
+  },
+  {
+    "id": "finish-14",
+    "name": "Weak Hand Finishing Circuit",
+    "category": "finishing",
+    "difficulty": 2,
+    "equipment": ["ball", "hoop"],
+    "duration": 12,
+    "targetReps": 30,
+    "cues": [
+      "Never use your strong hand in this drill",
+      "Finger roll, backboard layup, and power finish with weak hand only",
+      "Go at 70% speed to build comfort",
+      "Form matters more than speed here"
+    ],
+    "videoPlaceholder": "https://placehold.co/640x360?text=Weak+Hand+Finishing",
+    "description": "Dedicated weak-hand finishing circuit. Eliminating the weak hand is a game-changer."
+  },
+  {
+    "id": "handle-18",
+    "name": "Pull-Back Crossover",
+    "category": "ball-handling",
+    "difficulty": 2,
+    "equipment": ["ball"],
+    "duration": 10,
+    "cues": [
+      "Pound dribble, then pull back with crossover",
+      "Change of pace is the key — slow then fast",
+      "Keep the ball below your waist",
+      "Eyes up at all times"
+    ],
+    "videoPlaceholder": "https://placehold.co/640x360?text=Pull+Back+Cross",
+    "description": "Pull back to reset, then attack with a crossover. Creates space from aggressive defenders."
+  },
+  {
+    "id": "shoot-19",
+    "name": "Free Throw Routine Building",
+    "category": "shooting",
+    "difficulty": 1,
+    "equipment": ["ball", "hoop"],
+    "duration": 15,
+    "targetReps": 50,
+    "cues": [
+      "Same routine every single rep — build the habit",
+      "One breath to reset before each shot",
+      "Focus on the front of the rim",
+      "Exaggerate follow-through to build muscle memory"
+    ],
+    "videoPlaceholder": "https://placehold.co/640x360?text=FT+Routine",
+    "description": "Build a locked-in free throw routine. Consistency at the line wins close games."
+  },
+  {
+    "id": "foot-13",
+    "name": "Aggressive Catch and Square",
+    "category": "footwork",
+    "difficulty": 1,
+    "equipment": ["ball"],
+    "duration": 8,
+    "cues": [
+      "Catch moving toward the passer",
+      "Square shoulders to the basket immediately",
+      "Land in your shot pocket — ready to shoot",
+      "Read the defense as you catch"
+    ],
+    "videoPlaceholder": "https://placehold.co/640x360?text=Catch+and+Square",
+    "description": "Practice catching and squaring up to the basket in one fluid motion."
   }
 ]

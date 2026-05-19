@@ -2,12 +2,12 @@ import React, { useState, useRef, useEffect } from 'react';
 import {
   View, Text, ScrollView, TouchableOpacity, StyleSheet, SafeAreaView, Image, Alert,
 } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
 import { Drill } from '../types/drill';
-import { Colors } from '../theme/colors';
+import { useTheme } from '../theme/ThemeContext';
 import { Spacing, Radius, Shadow } from '../theme/spacing';
 
 const DIFFICULTY_LABELS = ['', 'Beginner', 'Intermediate', 'Advanced'];
-const DIFFICULTY_COLORS = ['', Colors.easy, Colors.medium, Colors.hard];
 
 const CATEGORY_LABELS: Record<string, string> = {
   shooting: 'Shooting',
@@ -24,12 +24,15 @@ interface Props {
   navigation: any;
 }
 
-export default function DrillDetailScreen({ route, navigation }: Props) {
+export default function DrillDetailScreen({ route }: Props) {
+  const { colors, isDark } = useTheme();
   const { drill } = route.params;
   const [timerActive, setTimerActive] = useState(false);
   const [elapsed, setElapsed] = useState(0);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const totalSeconds = drill.duration * 60;
+
+  const DIFFICULTY_COLORS = ['', colors.easy, colors.medium, colors.hard];
 
   useEffect(() => {
     if (timerActive) {
@@ -48,92 +51,99 @@ export default function DrillDetailScreen({ route, navigation }: Props) {
       if (intervalRef.current) clearInterval(intervalRef.current);
     }
     return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
-  }, [timerActive]);
+  }, [timerActive, totalSeconds, drill.name]);
 
   const mins = String(Math.floor((totalSeconds - elapsed) / 60)).padStart(2, '0');
   const secs = String((totalSeconds - elapsed) % 60).padStart(2, '0');
   const timerProgress = elapsed / totalSeconds;
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
+      <StatusBar style={isDark ? 'light' : 'dark'} />
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         {/* Hero image placeholder */}
         <Image
           source={{ uri: drill.videoPlaceholder }}
-          style={styles.hero}
+          style={[styles.hero, { backgroundColor: colors.accentLight }]}
           resizeMode="cover"
         />
 
         <View style={styles.body}>
           {/* Badges */}
           <View style={styles.badges}>
-            <View style={styles.catBadge}>
-              <Text style={styles.catText}>{CATEGORY_LABELS[drill.category] ?? drill.category}</Text>
+            <View style={[styles.catBadge, { backgroundColor: colors.accentLight }]}>
+              <Text style={[styles.catText, { color: colors.accent }]}>{CATEGORY_LABELS[drill.category] ?? drill.category}</Text>
             </View>
             <View style={[styles.diffBadge, { backgroundColor: DIFFICULTY_COLORS[drill.difficulty] }]}>
-              <Text style={styles.diffText}>{DIFFICULTY_LABELS[drill.difficulty]}</Text>
+              <Text style={[styles.diffText, { color: colors.white }]}>{DIFFICULTY_LABELS[drill.difficulty]}</Text>
             </View>
           </View>
 
-          <Text style={styles.name}>{drill.name}</Text>
-          <Text style={styles.desc}>{drill.description}</Text>
+          <Text style={[styles.name, { color: colors.textDark }]}>{drill.name}</Text>
+          <Text style={[styles.desc, { color: colors.textMid }]}>{drill.description}</Text>
 
           {/* Meta row */}
-          <View style={styles.metaRow}>
+          <View style={[styles.metaRow, { backgroundColor: colors.surface }]}>
             <View style={styles.metaItem}>
-              <Text style={styles.metaValue}>{drill.duration}</Text>
-              <Text style={styles.metaLabel}>minutes</Text>
+              <Text style={[styles.metaValue, { color: colors.primary }]}>{drill.duration}</Text>
+              <Text style={[styles.metaLabel, { color: colors.textMid }]}>minutes</Text>
             </View>
             {drill.targetSets && (
               <View style={styles.metaItem}>
-                <Text style={styles.metaValue}>{drill.targetSets}</Text>
-                <Text style={styles.metaLabel}>sets</Text>
+                <Text style={[styles.metaValue, { color: colors.primary }]}>{drill.targetSets}</Text>
+                <Text style={[styles.metaLabel, { color: colors.textMid }]}>sets</Text>
               </View>
             )}
             {drill.targetReps && (
               <View style={styles.metaItem}>
-                <Text style={styles.metaValue}>{drill.targetReps}</Text>
-                <Text style={styles.metaLabel}>reps</Text>
+                <Text style={[styles.metaValue, { color: colors.primary }]}>{drill.targetReps}</Text>
+                <Text style={[styles.metaLabel, { color: colors.textMid }]}>reps</Text>
               </View>
             )}
           </View>
 
           {/* Cues */}
-          <Text style={styles.sectionTitle}>Coaching Cues</Text>
+          <Text style={[styles.sectionTitle, { color: colors.textDark }]}>Coaching Cues</Text>
           <View style={styles.cuesList}>
             {drill.cues.map((cue, i) => (
               <View key={i} style={styles.cueItem}>
-                <View style={styles.cueDot} />
-                <Text style={styles.cueText}>{cue}</Text>
+                <View style={[styles.cueDot, { backgroundColor: colors.accent }]} />
+                <Text style={[styles.cueText, { color: colors.textDark }]}>{cue}</Text>
               </View>
             ))}
           </View>
 
           {/* Equipment */}
-          <Text style={styles.sectionTitle}>Equipment</Text>
+          <Text style={[styles.sectionTitle, { color: colors.textDark }]}>Equipment</Text>
           <View style={styles.equipRow}>
             {drill.equipment.map((e) => (
-              <View key={e} style={styles.equipChip}>
-                <Text style={styles.equipText}>{e.replace(/-/g, ' ')}</Text>
+              <View key={e} style={[styles.equipChip, { backgroundColor: colors.surface, borderColor: colors.surfaceBorder }]}>
+                <Text style={[styles.equipText, { color: colors.textMid }]}>{e.replace(/-/g, ' ')}</Text>
               </View>
             ))}
           </View>
 
           {/* Timer */}
-          <View style={styles.timerCard}>
+          <View style={[styles.timerCard, { backgroundColor: colors.primary }]}>
             <Text style={styles.timerLabel}>Session Timer</Text>
             <Text style={styles.timerDisplay}>{mins}:{secs}</Text>
             <View style={styles.timerBar}>
-              <View style={[styles.timerFill, { flex: timerProgress }]} />
+              <View style={[styles.timerFill, { flex: timerProgress, backgroundColor: colors.accent }]} />
               <View style={{ flex: 1 - timerProgress }} />
             </View>
             <View style={styles.timerButtons}>
               <TouchableOpacity
-                style={[styles.timerBtn, timerActive && styles.timerBtnStop]}
+                style={[
+                  styles.timerBtn,
+                  { backgroundColor: colors.accent },
+                  timerActive && { backgroundColor: colors.hard },
+                ]}
                 onPress={() => setTimerActive((v) => !v)}
                 activeOpacity={0.85}
               >
-                <Text style={styles.timerBtnText}>{timerActive ? 'Pause' : elapsed > 0 ? 'Resume' : 'Start'}</Text>
+                <Text style={[styles.timerBtnText, { color: colors.white }]}>
+                  {timerActive ? 'Pause' : elapsed > 0 ? 'Resume' : 'Start'}
+                </Text>
               </TouchableOpacity>
               {elapsed > 0 && (
                 <TouchableOpacity
@@ -153,44 +163,39 @@ export default function DrillDetailScreen({ route, navigation }: Props) {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: Colors.background },
   scroll: { paddingBottom: Spacing.xxl },
-  hero: { width: '100%', height: 220, backgroundColor: Colors.accentLight },
+  hero: { width: '100%', height: 220 },
   body: { padding: Spacing.lg, gap: Spacing.md },
   badges: { flexDirection: 'row', gap: Spacing.sm },
-  catBadge: { backgroundColor: Colors.accentLight, borderRadius: Radius.full, paddingHorizontal: 12, paddingVertical: 4 },
-  catText: { fontSize: 12, fontWeight: '700', color: Colors.accent },
+  catBadge: { borderRadius: Radius.full, paddingHorizontal: 12, paddingVertical: 4 },
+  catText: { fontSize: 12, fontWeight: '700' },
   diffBadge: { borderRadius: Radius.full, paddingHorizontal: 12, paddingVertical: 4 },
-  diffText: { fontSize: 12, fontWeight: '700', color: Colors.white },
-  name: { fontSize: 26, fontWeight: '800', color: Colors.textDark },
-  desc: { fontSize: 15, color: Colors.textMid, lineHeight: 22 },
+  diffText: { fontSize: 12, fontWeight: '700' },
+  name: { fontSize: 26, fontWeight: '800' },
+  desc: { fontSize: 15, lineHeight: 22 },
   metaRow: {
     flexDirection: 'row',
     gap: Spacing.md,
-    backgroundColor: Colors.surface,
     borderRadius: Radius.lg,
     padding: Spacing.md,
   },
   metaItem: { alignItems: 'center', flex: 1 },
-  metaValue: { fontSize: 24, fontWeight: '800', color: Colors.primary },
-  metaLabel: { fontSize: 12, color: Colors.textMid, marginTop: 2 },
-  sectionTitle: { fontSize: 17, fontWeight: '700', color: Colors.textDark },
+  metaValue: { fontSize: 24, fontWeight: '800' },
+  metaLabel: { fontSize: 12, marginTop: 2 },
+  sectionTitle: { fontSize: 17, fontWeight: '700' },
   cuesList: { gap: Spacing.sm },
   cueItem: { flexDirection: 'row', gap: Spacing.sm, alignItems: 'flex-start' },
-  cueDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: Colors.accent, marginTop: 6 },
-  cueText: { flex: 1, fontSize: 15, color: Colors.textDark, lineHeight: 22 },
+  cueDot: { width: 8, height: 8, borderRadius: 4, marginTop: 6 },
+  cueText: { flex: 1, fontSize: 15, lineHeight: 22 },
   equipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.sm },
   equipChip: {
-    backgroundColor: Colors.surface,
     borderRadius: Radius.full,
     paddingHorizontal: 12,
     paddingVertical: 5,
     borderWidth: 1,
-    borderColor: Colors.surfaceBorder,
   },
-  equipText: { fontSize: 13, color: Colors.textMid, fontWeight: '500', textTransform: 'capitalize' },
+  equipText: { fontSize: 13, fontWeight: '500', textTransform: 'capitalize' },
   timerCard: {
-    backgroundColor: Colors.primary,
     borderRadius: Radius.xl,
     padding: Spacing.lg,
     gap: Spacing.md,
@@ -198,7 +203,7 @@ const styles = StyleSheet.create({
     ...Shadow.md,
   },
   timerLabel: { color: 'rgba(255,255,255,0.7)', fontSize: 13, fontWeight: '600' },
-  timerDisplay: { color: Colors.white, fontSize: 52, fontWeight: '800', fontVariant: ['tabular-nums'] },
+  timerDisplay: { color: '#FFFFFF', fontSize: 52, fontWeight: '800', fontVariant: ['tabular-nums'] },
   timerBar: {
     flexDirection: 'row',
     height: 6,
@@ -207,17 +212,15 @@ const styles = StyleSheet.create({
     borderRadius: 3,
     overflow: 'hidden',
   },
-  timerFill: { backgroundColor: Colors.accent, borderRadius: 3 },
+  timerFill: { borderRadius: 3, width: '100%', minHeight: 4 },
   timerButtons: { flexDirection: 'row', gap: Spacing.md, alignItems: 'center' },
   timerBtn: {
-    backgroundColor: Colors.accent,
     borderRadius: Radius.md,
     paddingVertical: 12,
     paddingHorizontal: 32,
     ...Shadow.sm,
   },
-  timerBtnStop: { backgroundColor: Colors.error },
-  timerBtnText: { color: Colors.white, fontSize: 16, fontWeight: '700' },
+  timerBtnText: { fontSize: 16, fontWeight: '700' },
   resetBtn: { paddingVertical: 12, paddingHorizontal: 16 },
   resetText: { color: 'rgba(255,255,255,0.7)', fontSize: 14 },
 });

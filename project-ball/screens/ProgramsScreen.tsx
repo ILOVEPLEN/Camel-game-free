@@ -2,10 +2,11 @@ import React, { useEffect, useState } from 'react';
 import {
   View, Text, ScrollView, TouchableOpacity, StyleSheet, SafeAreaView, Alert,
 } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
 import { PROGRAMS } from '../data/programs';
 import { Program, ProgramEnrollment } from '../types/program';
 import { Storage } from '../lib/storage';
-import { Colors } from '../theme/colors';
+import { useTheme } from '../theme/ThemeContext';
 import { Spacing, Radius, Shadow } from '../theme/spacing';
 
 const GOAL_ICONS: Record<string, string> = {
@@ -21,6 +22,7 @@ const PROGRAM_COLORS: Record<string, string> = {
 };
 
 export default function ProgramsScreen() {
+  const { colors, isDark } = useTheme();
   const [enrollment, setEnrollment] = useState<ProgramEnrollment | null>(null);
 
   useEffect(() => {
@@ -76,10 +78,11 @@ export default function ProgramsScreen() {
   const activeProgram = enrollment ? PROGRAMS.find((p) => p.id === enrollment.programId) : null;
 
   return (
-    <SafeAreaView style={styles.safe}>
-      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-        <Text style={styles.title}>Programs</Text>
-        <Text style={styles.subtitle}>Enroll in a structured plan to get results faster.</Text>
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.surface }}>
+      <StatusBar style={isDark ? 'light' : 'dark'} />
+      <ScrollView contentContainerStyle={[styles.scroll, { gap: Spacing.md }]} showsVerticalScrollIndicator={false}>
+        <Text style={[styles.title, { color: colors.textDark }]}>Programs</Text>
+        <Text style={[styles.subtitle, { color: colors.textMid }]}>Enroll in a structured plan to get results faster.</Text>
 
         {activeProgram && enrollment && (
           <View style={[styles.activeCard, { backgroundColor: PROGRAM_COLORS[activeProgram.id] }]}>
@@ -99,10 +102,10 @@ export default function ProgramsScreen() {
         <View style={styles.list}>
           {PROGRAMS.map((program) => {
             const isActive = enrollment?.programId === program.id;
-            const color = PROGRAM_COLORS[program.id] ?? Colors.primary;
+            const color = PROGRAM_COLORS[program.id] ?? colors.primary;
             const totalDays = program.schedule.reduce((s, w) => s + w.days.length, 0);
             return (
-              <View key={program.id} style={styles.card}>
+              <View key={program.id} style={[styles.card, { backgroundColor: colors.background }]}>
                 <View style={[styles.cardHeader, { backgroundColor: color }]}>
                   <Text style={styles.cardIcon}>{GOAL_ICONS[program.focusGoal] ?? '🏀'}</Text>
                   <View style={styles.cardHeaderText}>
@@ -111,16 +114,16 @@ export default function ProgramsScreen() {
                   </View>
                 </View>
                 <View style={styles.cardBody}>
-                  <Text style={styles.cardDesc}>{program.description}</Text>
+                  <Text style={[styles.cardDesc, { color: colors.textMid }]}>{program.description}</Text>
                   <View style={styles.cardMeta}>
-                    <View style={styles.metaPill}>
-                      <Text style={styles.metaPillText}>{program.weeks} weeks</Text>
+                    <View style={[styles.metaPill, { backgroundColor: colors.surface }]}>
+                      <Text style={[styles.metaPillText, { color: colors.textMid }]}>{program.weeks} weeks</Text>
                     </View>
-                    <View style={styles.metaPill}>
-                      <Text style={styles.metaPillText}>{totalDays} sessions</Text>
+                    <View style={[styles.metaPill, { backgroundColor: colors.surface }]}>
+                      <Text style={[styles.metaPillText, { color: colors.textMid }]}>{totalDays} sessions</Text>
                     </View>
-                    <View style={[styles.metaPill, { backgroundColor: Colors.accentLight }]}>
-                      <Text style={[styles.metaPillText, { color: Colors.primary }]}>{program.focusGoal}</Text>
+                    <View style={[styles.metaPill, { backgroundColor: colors.accentLight }]}>
+                      <Text style={[styles.metaPillText, { color: colors.primary }]}>{program.focusGoal}</Text>
                     </View>
                   </View>
                   {!isActive ? (
@@ -132,8 +135,8 @@ export default function ProgramsScreen() {
                       <Text style={styles.enrollBtnText}>Start Program</Text>
                     </TouchableOpacity>
                   ) : (
-                    <View style={styles.activeLabel}>
-                      <Text style={styles.activeLabelText}>Currently enrolled</Text>
+                    <View style={[styles.activeLabel, { backgroundColor: colors.surface }]}>
+                      <Text style={[styles.activeLabelText, { color: colors.textMid }]}>Currently enrolled</Text>
                     </View>
                   )}
                 </View>
@@ -147,10 +150,9 @@ export default function ProgramsScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: Colors.surface },
-  scroll: { padding: Spacing.lg, gap: Spacing.md, paddingBottom: Spacing.xxl },
-  title: { fontSize: 28, fontWeight: '800', color: Colors.textDark },
-  subtitle: { fontSize: 15, color: Colors.textMid },
+  scroll: { padding: Spacing.lg, paddingBottom: Spacing.xxl },
+  title: { fontSize: 28, fontWeight: '800' },
+  subtitle: { fontSize: 15 },
   activeCard: {
     borderRadius: Radius.xl,
     padding: Spacing.lg,
@@ -164,8 +166,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 3,
   },
-  activeBadgeText: { color: Colors.white, fontSize: 12, fontWeight: '700' },
-  activeTitle: { color: Colors.white, fontSize: 22, fontWeight: '800' },
+  activeBadgeText: { color: '#FFFFFF', fontSize: 12, fontWeight: '700' },
+  activeTitle: { color: '#FFFFFF', fontSize: 22, fontWeight: '800' },
   activeProgress: { color: 'rgba(255,255,255,0.8)', fontSize: 14 },
   leaveBtn: {
     marginTop: Spacing.sm,
@@ -175,10 +177,9 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     alignItems: 'center',
   },
-  leaveBtnText: { color: Colors.white, fontWeight: '600', fontSize: 14 },
+  leaveBtnText: { color: '#FFFFFF', fontWeight: '600', fontSize: 14 },
   list: { gap: Spacing.md },
   card: {
-    backgroundColor: Colors.background,
     borderRadius: Radius.xl,
     overflow: 'hidden',
     ...Shadow.md,
@@ -186,30 +187,28 @@ const styles = StyleSheet.create({
   cardHeader: { padding: Spacing.md, flexDirection: 'row', alignItems: 'center', gap: Spacing.md },
   cardIcon: { fontSize: 32 },
   cardHeaderText: { flex: 1 },
-  cardTitle: { color: Colors.white, fontSize: 18, fontWeight: '800' },
+  cardTitle: { color: '#FFFFFF', fontSize: 18, fontWeight: '800' },
   cardTagline: { color: 'rgba(255,255,255,0.8)', fontSize: 13, marginTop: 2 },
   cardBody: { padding: Spacing.md, gap: Spacing.md },
-  cardDesc: { fontSize: 14, color: Colors.textMid, lineHeight: 20 },
+  cardDesc: { fontSize: 14, lineHeight: 20 },
   cardMeta: { flexDirection: 'row', gap: Spacing.sm, flexWrap: 'wrap' },
   metaPill: {
-    backgroundColor: Colors.surface,
     borderRadius: Radius.full,
     paddingHorizontal: 12,
     paddingVertical: 4,
   },
-  metaPillText: { fontSize: 12, fontWeight: '600', color: Colors.textMid },
+  metaPillText: { fontSize: 12, fontWeight: '600' },
   enrollBtn: {
     borderRadius: Radius.md,
     paddingVertical: 12,
     alignItems: 'center',
     ...Shadow.sm,
   },
-  enrollBtnText: { color: Colors.white, fontSize: 15, fontWeight: '700' },
+  enrollBtnText: { color: '#FFFFFF', fontSize: 15, fontWeight: '700' },
   activeLabel: {
     borderRadius: Radius.md,
     paddingVertical: 12,
     alignItems: 'center',
-    backgroundColor: Colors.surface,
   },
-  activeLabelText: { color: Colors.textMid, fontSize: 14, fontWeight: '600' },
+  activeLabelText: { fontSize: 14, fontWeight: '600' },
 });

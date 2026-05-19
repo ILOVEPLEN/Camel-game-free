@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { Colors } from '../theme/colors';
+import { useTheme } from '../theme/ThemeContext';
 import { Spacing, Radius } from '../theme/spacing';
 
 const RPE_LABELS: Record<number, string> = {
@@ -15,12 +15,14 @@ interface Props {
 }
 
 export default function RPESlider({ value, onChange }: Props) {
+  const { colors } = useTheme();
+
   return (
     <View style={styles.container}>
       <View style={styles.row}>
         {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => {
           const active = n === value;
-          const color = n <= 4 ? Colors.easy : n <= 7 ? Colors.warning : Colors.error;
+          const color = n <= 4 ? colors.easy : n <= 7 ? colors.medium : colors.hard;
           return (
             <TouchableOpacity
               key={n}
@@ -28,13 +30,13 @@ export default function RPESlider({ value, onChange }: Props) {
               onPress={() => onChange(n)}
               activeOpacity={0.8}
             >
-              <Text style={[styles.dotText, active && styles.dotTextActive]}>{n}</Text>
+              <Text style={[styles.dotText, { color: colors.textDark }, active && { color: colors.white }]}>{n}</Text>
             </TouchableOpacity>
           );
         })}
       </View>
       {value > 0 && (
-        <Text style={styles.label}>RPE {value} — {RPE_LABELS[value]}</Text>
+        <Text style={[styles.label, { color: colors.textMid }]}>RPE {value} — {RPE_LABELS[value]}</Text>
       )}
     </View>
   );
@@ -51,7 +53,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  dotText: { fontSize: 13, fontWeight: '700', color: Colors.textDark },
-  dotTextActive: { color: Colors.white },
-  label: { textAlign: 'center', fontSize: 13, color: Colors.textMid, fontWeight: '500' },
+  dotText: { fontSize: 13, fontWeight: '700' },
+  label: { textAlign: 'center', fontSize: 13, fontWeight: '500' },
 });
