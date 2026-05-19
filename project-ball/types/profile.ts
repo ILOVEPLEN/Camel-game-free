@@ -13,6 +13,7 @@ export type EquipmentAccess =
   | 'ball-and-hoop';
 
 export interface PlayerProfile {
+  name: string;
   position: Position;
   skillLevel: SkillLevel;
   goals: Goal[];
