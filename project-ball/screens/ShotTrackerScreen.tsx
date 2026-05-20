@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import {
   View, Text, ScrollView, TouchableOpacity, StyleSheet, SafeAreaView,
-  Modal, Alert,
+  Modal, Alert, Vibration,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useTheme } from '../theme/ThemeContext';
 import { Spacing, Radius, Shadow } from '../theme/spacing';
 import { Storage, ShotSession } from '../lib/storage';
+
+type TabMode = 'counter' | 'zones';
 
 interface ZoneStats {
   makes: number;
@@ -64,6 +66,61 @@ const THREE_POINT_ZONES: ZoneId[] = [
 
 export default function ShotTrackerScreen() {
   const { colors, isDark } = useTheme();
+  const [tab, setTab] = useState<TabMode>('counter');
+
+  // ── Quick counter state ──
+  const [counterMakes, setCounterMakes] = useState(0);
+  const [counterAttempts, setCounterAttempts] = useState(0);
+  const [history, setHistory] = useState<boolean[]>([]); // true=make, false=miss
+
+  const recordCounter = (make: boolean) => {
+    Vibration.vibrate(30);
+    setCounterMakes((p) => p + (make ? 1 : 0));
+    setCounterAttempts((p) => p + 1);
+    setHistory((p) => [...p, make]);
+  };
+
+  const undoCounter = () => {
+    if (history.length === 0) return;
+    const last = history[history.length - 1];
+    setCounterMakes((p) => p - (last ? 1 : 0));
+    setCounterAttempts((p) => p - 1);
+    setHistory((p) => p.slice(0, -1));
+  };
+
+  const resetCounter = () => {
+    if (counterAttempts === 0) return;
+    Alert.alert('Reset Counter?', 'Current session will be cleared.', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Reset', style: 'destructive', onPress: () => {
+          setCounterMakes(0); setCounterAttempts(0); setHistory([]);
+        },
+      },
+    ]);
+  };
+
+  const saveCounter = async () => {
+    if (counterAttempts === 0) {
+      Alert.alert('No shots yet', 'Hit Make or Miss to start tracking.');
+      return;
+    }
+    const session: ShotSession = {
+      id: `shot-${Date.now()}`,
+      date: new Date().toISOString().slice(0, 10),
+      zones: makeEmpty(),
+      totalMakes: counterMakes,
+      totalAttempts: counterAttempts,
+    };
+    await Storage.appendShotSession(session);
+    Alert.alert(
+      'Session Saved!',
+      `${counterMakes}/${counterAttempts} (${fgPct(counterMakes, counterAttempts)})`,
+      [{ text: 'OK', onPress: () => { setCounterMakes(0); setCounterAttempts(0); setHistory([]); } }],
+    );
+  };
+
+  // ── Zone tracker state ──
   const [zones, setZones] = useState<Record<ZoneId, ZoneStats>>(makeEmpty());
   const [selectedZone, setSelectedZone] = useState<ZoneId | null>(null);
   const [shotModalVisible, setShotModalVisible] = useState(false);
@@ -146,6 +203,106 @@ export default function ShotTrackerScreen() {
       <StatusBar style={isDark ? 'light' : 'dark'} />
       <ScrollView contentContainerStyle={[styles.scroll, { gap: Spacing.md }]} showsVerticalScrollIndicator={false}>
         <Text style={[styles.title, { color: colors.textDark }]}>Shot Tracker</Text>
+
+        {/* Tab switcher */}
+        <View style={[styles.tabBar, { backgroundColor: colors.background, borderColor: colors.surfaceBorder }]}>
+          {(['counter', 'zones'] as TabMode[]).map((t) => (
+            <TouchableOpacity
+              key={t}
+              style={[styles.tabBtn, tab === t && { backgroundColor: colors.primary }]}
+              onPress={() => setTab(t)}
+              activeOpacity={0.8}
+            >
+              <Text style={[styles.tabBtnText, { color: tab === t ? colors.white : colors.textMid }]}>
+                {t === 'counter' ? '🎯 Quick Count' : '🗺 Zone Map'}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        {tab === 'counter' ? (
+          <>
+            {/* Big FG% display */}
+            <View style={[styles.counterCard, { backgroundColor: colors.background }]}>
+              <Text style={[styles.counterPct, { color: colors.primary }]}>
+                {counterAttempts === 0 ? '—' : `${Math.round((counterMakes / counterAttempts) * 100)}%`}
+              </Text>
+              <Text style={[styles.counterScore, { color: colors.textDark }]}>
+                {counterMakes} / {counterAttempts}
+              </Text>
+              <Text style={[styles.counterLabel, { color: colors.textMid }]}>makes · attempts</Text>
+
+              {/* Shot history bubbles */}
+              {history.length > 0 && (
+                <View style={styles.historyRow}>
+                  {history.slice(-20).map((made, i) => (
+                    <View
+                      key={i}
+                      style={[
+                        styles.historyDot,
+                        { backgroundColor: made ? colors.easy : colors.hard },
+                      ]}
+                    />
+                  ))}
+                  {history.length > 20 && (
+                    <Text style={[styles.historyMore, { color: colors.textLight }]}>
+                      +{history.length - 20}
+                    </Text>
+                  )}
+                </View>
+              )}
+            </View>
+
+            {/* Make / Miss buttons */}
+            <View style={styles.counterBtns}>
+              <TouchableOpacity
+                style={[styles.makeCounterBtn, { backgroundColor: colors.easy }]}
+                onPress={() => recordCounter(true)}
+                activeOpacity={0.8}
+              >
+                <Text style={styles.counterBtnIcon}>✓</Text>
+                <Text style={styles.counterBtnLabel}>MAKE</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.missCounterBtn, { backgroundColor: colors.hard }]}
+                onPress={() => recordCounter(false)}
+                activeOpacity={0.8}
+              >
+                <Text style={styles.counterBtnIcon}>✗</Text>
+                <Text style={styles.counterBtnLabel}>MISS</Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* Undo / Reset / Save */}
+            <View style={styles.counterActions}>
+              <TouchableOpacity
+                style={[styles.counterActionBtn, { backgroundColor: colors.background, borderColor: colors.surfaceBorder }]}
+                onPress={undoCounter}
+                activeOpacity={0.8}
+                disabled={history.length === 0}
+              >
+                <Text style={[styles.counterActionText, { color: history.length === 0 ? colors.textLight : colors.textDark }]}>
+                  ↩ Undo
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.counterActionBtn, { backgroundColor: colors.background, borderColor: colors.surfaceBorder }]}
+                onPress={resetCounter}
+                activeOpacity={0.8}
+              >
+                <Text style={[styles.counterActionText, { color: colors.hard }]}>Reset</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.counterActionBtn, { backgroundColor: colors.primary }]}
+                onPress={saveCounter}
+                activeOpacity={0.85}
+              >
+                <Text style={[styles.counterActionText, { color: colors.white }]}>Save</Text>
+              </TouchableOpacity>
+            </View>
+          </>
+        ) : (
+          <>
         <Text style={[styles.subtitle, { color: colors.textMid }]}>Tap a zone to log a shot</Text>
 
         {/* Half-Court Layout */}
@@ -321,6 +478,8 @@ export default function ShotTrackerScreen() {
             <Text style={[styles.resetBtnText, { color: colors.hard }]}>Reset</Text>
           </TouchableOpacity>
         </View>
+          </>
+        )}
       </ScrollView>
 
       {/* Shot Modal */}
@@ -396,6 +555,72 @@ const styles = StyleSheet.create({
   scroll: { padding: Spacing.lg, paddingBottom: Spacing.xxl },
   title: { fontSize: 28, fontWeight: '800' },
   subtitle: { fontSize: 14 },
+
+  // Tab switcher
+  tabBar: {
+    flexDirection: 'row',
+    borderRadius: Radius.full,
+    borderWidth: 1.5,
+    padding: 3,
+    gap: 3,
+  },
+  tabBtn: {
+    flex: 1,
+    borderRadius: Radius.full,
+    paddingVertical: 10,
+    alignItems: 'center',
+  },
+  tabBtnText: { fontSize: 14, fontWeight: '700' },
+
+  // Quick counter
+  counterCard: {
+    borderRadius: Radius.xl,
+    padding: Spacing.xl,
+    alignItems: 'center',
+    gap: Spacing.sm,
+    ...Shadow.sm,
+  },
+  counterPct: { fontSize: 72, fontWeight: '900', lineHeight: 80 },
+  counterScore: { fontSize: 28, fontWeight: '700' },
+  counterLabel: { fontSize: 13, fontWeight: '500' },
+  historyRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    gap: 5,
+    marginTop: Spacing.sm,
+    paddingHorizontal: Spacing.md,
+  },
+  historyDot: { width: 12, height: 12, borderRadius: 6 },
+  historyMore: { fontSize: 12, fontWeight: '600', alignSelf: 'center' },
+  counterBtns: { flexDirection: 'row', gap: Spacing.md, height: 160 },
+  makeCounterBtn: {
+    flex: 1,
+    borderRadius: Radius.xl,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    ...Shadow.md,
+  },
+  missCounterBtn: {
+    flex: 1,
+    borderRadius: Radius.xl,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    ...Shadow.md,
+  },
+  counterBtnIcon: { fontSize: 40, color: '#FFFFFF', fontWeight: '900' },
+  counterBtnLabel: { fontSize: 20, fontWeight: '800', color: '#FFFFFF', letterSpacing: 1 },
+  counterActions: { flexDirection: 'row', gap: Spacing.sm },
+  counterActionBtn: {
+    flex: 1,
+    borderRadius: Radius.md,
+    paddingVertical: 14,
+    alignItems: 'center',
+    borderWidth: 1.5,
+  },
+  counterActionText: { fontSize: 15, fontWeight: '700' },
 
   // Court
   court: {
