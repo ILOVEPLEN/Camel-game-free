@@ -25,6 +25,12 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "scheme": "projectball"
+    "scheme": "projectball",
+    "plugins": [
+      [
+        "expo-camera",
+        { "cameraPermission": "Allow Project Ball to access your camera so you can track shots while you shoot." }
+      ]
+    ]
   }
 }
