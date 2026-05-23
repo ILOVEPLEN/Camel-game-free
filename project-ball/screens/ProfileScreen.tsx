@@ -8,6 +8,8 @@ import { Storage } from '../lib/storage';
 import { PlayerProfile } from '../types/profile';
 import { useTheme } from '../theme/ThemeContext';
 import { ThemeMode } from '../theme/ThemeContext';
+import { useSubscription } from '../context/SubscriptionContext';
+import { setProUser } from '../lib/subscriptions';
 import { Spacing, Radius, Shadow } from '../theme/spacing';
 
 const POSITION_FULL: Record<string, string> = {
@@ -36,6 +38,7 @@ interface Props {
 
 export default function ProfileScreen({ onReset }: Props) {
   const { colors, isDark, mode, setMode } = useTheme();
+  const { isPro, showPaywall, refreshPro } = useSubscription();
   const [profile, setProfile] = useState<PlayerProfile | null>(null);
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [editName, setEditName] = useState('');
@@ -108,6 +111,29 @@ export default function ProfileScreen({ onReset }: Props) {
             <Text style={styles.editBtnText}>Edit Profile</Text>
           </TouchableOpacity>
         </View>
+
+        {/* Subscription card */}
+        {isPro ? (
+          <View style={[styles.proCard, { backgroundColor: '#1a2f1a' }]}>
+            <Text style={styles.proCardIcon}>🏆</Text>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.proCardTitle}>Project Ball Pro</Text>
+              <Text style={styles.proCardSub}>All features unlocked · Cancel anytime</Text>
+            </View>
+            <TouchableOpacity onPress={async () => { await setProUser(false); await refreshPro(); }} activeOpacity={0.7}>
+              <Text style={{ color: 'rgba(255,255,255,0.4)', fontSize: 12 }}>Dev: off</Text>
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <TouchableOpacity style={styles.upgradeCard} onPress={showPaywall} activeOpacity={0.85}>
+            <View style={{ flex: 1, gap: 4 }}>
+              <Text style={styles.upgradeTitle}>Upgrade to Pro 🏆</Text>
+              <Text style={styles.upgradeSub}>Camera tracker · All programs · Full analytics</Text>
+              <Text style={styles.upgradePrice}>From $5.99/mo · 7-day free trial</Text>
+            </View>
+            <Text style={{ color: '#FFFFFF', fontSize: 22 }}>›</Text>
+          </TouchableOpacity>
+        )}
 
         {/* Appearance */}
         <View style={[styles.card, { backgroundColor: colors.background }]}>
@@ -295,6 +321,23 @@ const styles = StyleSheet.create({
   infoValue: { fontSize: 15, fontWeight: '700' },
   divider: { height: 1 },
   aboutText: { fontSize: 14, lineHeight: 22 },
+  proCard: {
+    borderRadius: Radius.xl, padding: Spacing.lg,
+    flexDirection: 'row', alignItems: 'center', gap: Spacing.md,
+    borderWidth: 1, borderColor: 'rgba(34,197,94,0.3)',
+  },
+  proCardIcon: { fontSize: 28 },
+  proCardTitle: { color: '#FFFFFF', fontSize: 16, fontWeight: '800' },
+  proCardSub: { color: 'rgba(255,255,255,0.55)', fontSize: 13 },
+  upgradeCard: {
+    borderRadius: Radius.xl, padding: Spacing.lg,
+    flexDirection: 'row', alignItems: 'center', gap: Spacing.md,
+    backgroundColor: '#1E3A8A',
+    ...Shadow.md,
+  },
+  upgradeTitle: { color: '#FFFFFF', fontSize: 17, fontWeight: '800' },
+  upgradeSub: { color: 'rgba(255,255,255,0.7)', fontSize: 13 },
+  upgradePrice: { color: '#60A5FA', fontSize: 13, fontWeight: '600', marginTop: 2 },
   resetBtn: {
     borderWidth: 1.5,
     borderRadius: Radius.md,

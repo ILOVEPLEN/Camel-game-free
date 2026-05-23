@@ -8,6 +8,7 @@ import { CameraView, useCameraPermissions } from 'expo-camera';
 import { useTheme } from '../theme/ThemeContext';
 import { Spacing, Radius, Shadow } from '../theme/spacing';
 import { Storage, ShotSession } from '../lib/storage';
+import { useSubscription } from '../context/SubscriptionContext';
 
 type TabMode = 'counter' | 'zones' | 'camera';
 
@@ -74,6 +75,7 @@ function fgPct(makes: number, attempts: number): string {
 
 export default function ShotTrackerScreen() {
   const { colors, isDark } = useTheme();
+  const { isPro, showPaywall } = useSubscription();
   const [tab, setTab] = useState<TabMode>('counter');
   const [permission, requestPermission] = useCameraPermissions();
 
@@ -207,18 +209,21 @@ export default function ShotTrackerScreen() {
       <View style={[styles.topBar, { backgroundColor: colors.surface }]}>
         <Text style={[styles.title, { color: colors.textDark }]}>Shot Tracker</Text>
         <View style={[styles.tabBar, { backgroundColor: colors.background, borderColor: colors.surfaceBorder }]}>
-          {(['counter', 'zones', 'camera'] as TabMode[]).map((t) => (
-            <TouchableOpacity
-              key={t}
-              style={[styles.tabBtn, tab === t && { backgroundColor: colors.primary }]}
-              onPress={() => setTab(t)}
-              activeOpacity={0.8}
-            >
-              <Text style={[styles.tabBtnText, { color: tab === t ? colors.white : colors.textMid }]}>
-                {t === 'counter' ? '🎯 Count' : t === 'zones' ? '🗺 Zones' : '📷 Camera'}
-              </Text>
-            </TouchableOpacity>
-          ))}
+          {(['counter', 'zones', 'camera'] as TabMode[]).map((t) => {
+            const isLocked = t === 'camera' && !isPro;
+            return (
+              <TouchableOpacity
+                key={t}
+                style={[styles.tabBtn, tab === t && { backgroundColor: colors.primary }]}
+                onPress={() => { if (isLocked) { showPaywall(); } else { setTab(t); } }}
+                activeOpacity={0.8}
+              >
+                <Text style={[styles.tabBtnText, { color: tab === t ? colors.white : colors.textMid }]}>
+                  {t === 'counter' ? '🎯 Count' : t === 'zones' ? '🗺 Zones' : isLocked ? '🔒 Camera' : '📷 Camera'}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
         </View>
       </View>
 

@@ -1,11 +1,12 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { View, Text, ActivityIndicator } from 'react-native';
+import { View, Text, ActivityIndicator, Modal } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StatusBar } from 'expo-status-bar';
 import { Storage } from './lib/storage';
 import { ThemeProvider, useTheme } from './theme/ThemeContext';
+import { SubscriptionProvider, useSubscription } from './context/SubscriptionContext';
 import OnboardingNavigator from './screens/onboarding/OnboardingNavigator';
 import HomeScreen from './screens/HomeScreen';
 import DrillsScreen from './screens/DrillsScreen';
@@ -16,6 +17,7 @@ import ProgramsScreen from './screens/ProgramsScreen';
 import ProgressScreen from './screens/ProgressScreen';
 import ProfileScreen from './screens/ProfileScreen';
 import ShotTrackerScreen from './screens/ShotTrackerScreen';
+import PaywallScreen from './screens/PaywallScreen';
 
 const Tab = createBottomTabNavigator();
 const DrillsStack = createNativeStackNavigator();
@@ -138,10 +140,24 @@ function AppRoot() {
   return <AppNavigator onReset={() => setOnboarded(false)} />;
 }
 
+function AppWithPaywall() {
+  const { paywallVisible, hidePaywall } = useSubscription();
+  return (
+    <>
+      <AppRoot />
+      <Modal visible={paywallVisible} animationType="slide" presentationStyle="fullScreen" onRequestClose={hidePaywall}>
+        <PaywallScreen />
+      </Modal>
+    </>
+  );
+}
+
 export default function App() {
   return (
     <ThemeProvider>
-      <AppRoot />
+      <SubscriptionProvider>
+        <AppWithPaywall />
+      </SubscriptionProvider>
     </ThemeProvider>
   );
 }
