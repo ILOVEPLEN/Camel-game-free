@@ -2,31 +2,32 @@ import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
 import { useTheme } from '../../theme/ThemeContext';
 import { Spacing, Radius, Shadow } from '../../theme/spacing';
-import { GymEquipment } from '../../types/profile';
+import { BBEquipment } from '../../types/profile';
 
-const OPTIONS: { value: GymEquipment; label: string; desc: string; icon: string }[] = [
-  { value: 'no-gym', label: 'No Gym', icon: '🚫', desc: 'No weight room access — basketball only' },
-  { value: 'home-gym', label: 'Home Gym', icon: '🏠', desc: 'Dumbbells, resistance bands, bodyweight' },
-  { value: 'full-gym', label: 'Full Gym', icon: '🏋️', desc: 'Barbells, squat rack, full weight room' },
+const OPTIONS: { value: BBEquipment; label: string; desc: string; icon: string }[] = [
+  { value: 'ball-only', label: 'Ball Only', icon: '🏀', desc: 'Just a basketball — no hoop nearby' },
+  { value: 'ball-and-hoop', label: 'Ball + Hoop', icon: '⛹️', desc: 'A ball and a basket to shoot at' },
+  { value: 'court-only', label: 'Court', icon: '🏟️', desc: 'Full court with hoop and cones' },
+  { value: 'full-court', label: 'Full Setup', icon: '⭐', desc: 'Court, cones, two balls, all accessories' },
 ];
 
 interface Props {
-  onNext: (equipment: GymEquipment) => void;
+  onNext: (equipment: BBEquipment) => void;
   stepLabel?: string;
 }
 
-export default function EquipmentScreen({ onNext, stepLabel = '6 of 7' }: Props) {
+export default function BBEquipmentScreen({ onNext, stepLabel = '5 of 7' }: Props) {
   const { colors } = useTheme();
-  const [selected, setSelected] = useState<GymEquipment | null>(null);
+  const [selected, setSelected] = useState<BBEquipment | null>(null);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
       <View style={styles.container}>
         <View style={styles.header}>
           <Text style={[styles.step, { color: colors.accent }]}>{stepLabel}</Text>
-          <Text style={[styles.title, { color: colors.textDark }]}>Gym access?</Text>
+          <Text style={[styles.title, { color: colors.textDark }]}>Basketball setup?</Text>
           <Text style={[styles.subtitle, { color: colors.textMid }]}>
-            We'll add a strength & conditioning block if you have the kit.
+            We'll only give you drills you can actually run.
           </Text>
         </View>
 

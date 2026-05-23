@@ -163,10 +163,15 @@ export default function HomeScreen({ navigation }: any) {
     );
   }
 
-  const blockOrder = ['warmup', 'skill', 'lift', 'conditioning', 'cooldown'];
-  const sorted = [...session.drills].sort(
-    (a, b) => blockOrder.indexOf(a.block) - blockOrder.indexOf(b.block)
-  );
+  const bbBlocks = ['warmup', 'skill', 'conditioning', 'cooldown'];
+  const gymBlocks = ['lift'];
+
+  const bbDrills = [...session.drills]
+    .filter((sd) => bbBlocks.includes(sd.block))
+    .sort((a, b) => bbBlocks.indexOf(a.block) - bbBlocks.indexOf(b.block));
+
+  const gymDrills = [...session.drills]
+    .filter((sd) => gymBlocks.includes(sd.block));
 
   const firstName = profile?.name?.split(' ')[0] ?? '';
 
@@ -174,7 +179,7 @@ export default function HomeScreen({ navigation }: any) {
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.surface }}>
       <StatusBar style={isDark ? 'light' : 'dark'} />
       <ScrollView
-        contentContainerStyle={[styles.scroll, { gap: Spacing.md, paddingBottom: Spacing.xxl }]}
+        contentContainerStyle={[styles.scroll, { gap: Spacing.md, paddingBottom: 120 }]}
         showsVerticalScrollIndicator={false}
       >
         {/* Header */}
@@ -218,9 +223,14 @@ export default function HomeScreen({ navigation }: any) {
           </View>
         </View>
 
-        {/* Drill list */}
+        {/* Basketball section */}
+        <View style={[styles.sectionHeader, { backgroundColor: colors.primary }]}>
+          <Text style={styles.sectionIcon}>🏀</Text>
+          <Text style={styles.sectionTitle}>Basketball</Text>
+          <Text style={styles.sectionCount}>{bbDrills.length} drills</Text>
+        </View>
         <View style={styles.list}>
-          {sorted.map((sd) => (
+          {bbDrills.map((sd) => (
             <WorkoutItem
               key={sd.drill.id}
               item={sd}
@@ -232,6 +242,30 @@ export default function HomeScreen({ navigation }: any) {
             />
           ))}
         </View>
+
+        {/* Gym section — only shown if there are gym drills */}
+        {gymDrills.length > 0 && (
+          <>
+            <View style={[styles.sectionHeader, { backgroundColor: '#5B21B6' }]}>
+              <Text style={styles.sectionIcon}>🏋️</Text>
+              <Text style={styles.sectionTitle}>Gym</Text>
+              <Text style={styles.sectionCount}>{gymDrills.length} drills</Text>
+            </View>
+            <View style={styles.list}>
+              {gymDrills.map((sd) => (
+                <WorkoutItem
+                  key={sd.drill.id}
+                  item={sd}
+                  completed={completedIds.has(sd.drill.id)}
+                  onPress={() => {
+                    markComplete(sd.drill.id);
+                    openDrillDetail(sd);
+                  }}
+                />
+              ))}
+            </View>
+          </>
+        )}
 
         {completedIds.size > 0 && (
           <TouchableOpacity
@@ -332,6 +366,17 @@ const styles = StyleSheet.create({
   progressSub: { fontSize: 13 },
   shortenBtn: { marginTop: Spacing.sm },
   shortenText: { fontSize: 13, fontWeight: '600' },
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: Radius.md,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: 10,
+    gap: Spacing.sm,
+  },
+  sectionIcon: { fontSize: 18 },
+  sectionTitle: { flex: 1, color: '#FFFFFF', fontSize: 15, fontWeight: '800' },
+  sectionCount: { color: 'rgba(255,255,255,0.7)', fontSize: 13 },
   list: { gap: Spacing.sm },
   finishBtn: {
     borderRadius: Radius.md,

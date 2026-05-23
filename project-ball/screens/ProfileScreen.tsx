@@ -22,6 +22,12 @@ const GOAL_LABELS: Record<string, string> = {
   shooting: 'Shooting', handles: 'Ball Handling', finishing: 'Finishing',
   athleticism: 'Athleticism', conditioning: 'Conditioning',
 };
+const BB_EQUIP_LABELS: Record<string, string> = {
+  'ball-only': 'Ball Only', 'ball-and-hoop': 'Ball + Hoop', 'court-only': 'Court', 'full-court': 'Full Setup',
+};
+const GYM_EQUIP_LABELS: Record<string, string> = {
+  'no-gym': 'No Gym', 'home-gym': 'Home Gym', 'full-gym': 'Full Gym',
+};
 const EQUIP_LABELS: Record<string, string> = {
   'full-gym': 'Full Gym', 'home-gym': 'Home Gym', 'court-only': 'Court Only', 'ball-and-hoop': 'Ball + Hoop',
 };
@@ -177,8 +183,23 @@ export default function ProfileScreen({ onReset }: Props) {
         <View style={[styles.card, { backgroundColor: colors.background }]}>
           <Text style={[styles.cardTitle, { color: colors.textDark }]}>Setup</Text>
           <View style={styles.infoRow}>
-            <Text style={[styles.infoLabel, { color: colors.textMid }]}>Equipment</Text>
-            <Text style={[styles.infoValue, { color: colors.textDark }]}>{EQUIP_LABELS[profile.equipmentAccess]}</Text>
+            <Text style={[styles.infoLabel, { color: colors.textMid }]}>🏀 Basketball</Text>
+            <Text style={[styles.infoValue, { color: colors.textDark }]}>
+              {profile.bbEquipment
+                ? BB_EQUIP_LABELS[profile.bbEquipment]
+                : EQUIP_LABELS[profile.equipmentAccess ?? 'ball-and-hoop']}
+            </Text>
+          </View>
+          <View style={[styles.divider, { backgroundColor: colors.surfaceBorder }]} />
+          <View style={styles.infoRow}>
+            <Text style={[styles.infoLabel, { color: colors.textMid }]}>🏋️ Gym</Text>
+            <Text style={[styles.infoValue, { color: colors.textDark }]}>
+              {profile.gymEquipment
+                ? GYM_EQUIP_LABELS[profile.gymEquipment]
+                : (profile.equipmentAccess === 'full-gym' || profile.equipmentAccess === 'home-gym'
+                    ? EQUIP_LABELS[profile.equipmentAccess]
+                    : 'No Gym')}
+            </Text>
           </View>
           <View style={[styles.divider, { backgroundColor: colors.surfaceBorder }]} />
           <View style={styles.infoRow}>

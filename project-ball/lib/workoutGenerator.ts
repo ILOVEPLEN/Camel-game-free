@@ -1,4 +1,4 @@
-import { PlayerProfile, EquipmentAccess, Goal } from '../types/profile';
+import { PlayerProfile, BBEquipment, GymEquipment, Goal } from '../types/profile';
 import { WorkoutSession, SessionDrill, SessionBlock } from '../types/workout';
 import { Drill, Equipment, DrillCategory } from '../types/drill';
 import drillsData from '../data/drills.json';
@@ -8,18 +8,32 @@ function genId(): string {
   return `session-${Date.now()}-${Math.floor(Math.random() * 1e9)}`;
 }
 
-const EQUIPMENT_MAP: Record<EquipmentAccess, Equipment[]> = {
-  'full-gym': ['ball', 'hoop', 'cones', 'two-balls', 'tennis-ball', 'resistance-band', 'pad', 'barbell', 'dumbbell', 'trap-bar', 'med-ball', 'box', 'none'],
-  'home-gym': ['ball', 'hoop', 'cones', 'two-balls', 'tennis-ball', 'resistance-band', 'dumbbell', 'med-ball', 'box', 'none'],
-  'court-only': ['ball', 'hoop', 'cones', 'two-balls', 'tennis-ball', 'pad', 'none'],
+const BB_EQUIPMENT_MAP: Record<BBEquipment, Equipment[]> = {
+  'ball-only':    ['ball', 'none'],
+  'ball-and-hoop': ['ball', 'hoop', 'none'],
+  'court-only':   ['ball', 'hoop', 'cones', 'two-balls', 'tennis-ball', 'pad', 'none'],
+  'full-court':   ['ball', 'hoop', 'cones', 'two-balls', 'tennis-ball', 'pad', 'none'],
+};
+
+const GYM_EQUIPMENT_MAP: Record<GymEquipment, Equipment[]> = {
+  'no-gym':   [],
+  'home-gym': ['dumbbell', 'resistance-band', 'med-ball', 'box', 'none'],
+  'full-gym': ['barbell', 'dumbbell', 'trap-bar', 'resistance-band', 'med-ball', 'box', 'none'],
+};
+
+// Legacy fallback for profiles saved before the equipment split
+const LEGACY_EQUIPMENT_MAP: Record<string, Equipment[]> = {
+  'full-gym':     ['ball', 'hoop', 'cones', 'two-balls', 'tennis-ball', 'resistance-band', 'pad', 'barbell', 'dumbbell', 'trap-bar', 'med-ball', 'box', 'none'],
+  'home-gym':     ['ball', 'hoop', 'cones', 'two-balls', 'tennis-ball', 'resistance-band', 'dumbbell', 'med-ball', 'box', 'none'],
+  'court-only':   ['ball', 'hoop', 'cones', 'two-balls', 'tennis-ball', 'pad', 'none'],
   'ball-and-hoop': ['ball', 'hoop', 'none'],
 };
 
 const GOAL_CATEGORY_MAP: Record<Goal, DrillCategory[]> = {
-  shooting: ['shooting'],
-  handles: ['ball-handling'],
-  finishing: ['finishing', 'footwork'],
-  athleticism: ['strength', 'conditioning'],
+  shooting:     ['shooting'],
+  handles:      ['ball-handling'],
+  finishing:    ['finishing', 'footwork'],
+  athleticism:  ['strength', 'conditioning'],
   conditioning: ['conditioning'],
 };
 
@@ -45,8 +59,7 @@ function pickFrom(
       d.difficulty <= difficulty &&
       !exclude.has(d.id)
   );
-  const shuffled = candidates.sort(() => Math.random() - 0.5);
-  return shuffled.slice(0, count);
+  return candidates.sort(() => Math.random() - 0.5).slice(0, count);
 }
 
 function difficultyFor(level: PlayerProfile['skillLevel']): 1 | 2 | 3 {
@@ -55,50 +68,61 @@ function difficultyFor(level: PlayerProfile['skillLevel']): 1 | 2 | 3 {
   return 3;
 }
 
+function resolveBBAvail(profile: PlayerProfile): Equipment[] {
+  if (profile.bbEquipment) return BB_EQUIPMENT_MAP[profile.bbEquipment];
+  // Legacy fallback
+  const legacy = profile.equipmentAccess ?? 'ball-and-hoop';
+  const all = LEGACY_EQUIPMENT_MAP[legacy] ?? [];
+  const gymOnly: Equipment[] = ['barbell', 'dumbbell', 'trap-bar', 'resistance-band', 'med-ball', 'box'];
+  return all.filter((e) => !gymOnly.includes(e));
+}
+
+function resolveGymAvail(profile: PlayerProfile): Equipment[] {
+  if (profile.gymEquipment) return GYM_EQUIPMENT_MAP[profile.gymEquipment];
+  // Legacy fallback
+  const legacy = profile.equipmentAccess ?? 'court-only';
+  if (legacy === 'full-gym') return GYM_EQUIPMENT_MAP['full-gym'];
+  if (legacy === 'home-gym') return GYM_EQUIPMENT_MAP['home-gym'];
+  return [];
+}
+
 export function generateSession(
   profile: PlayerProfile,
   volumeMultiplier = 1.0
 ): WorkoutSession {
-  const available = EQUIPMENT_MAP[profile.equipmentAccess];
+  const bbAvail = resolveBBAvail(profile);
+  const gymAvail = resolveGymAvail(profile);
   const diff = difficultyFor(profile.skillLevel);
   const targetMinutes = Math.round(profile.minutesPerSession * volumeMultiplier);
   const used = new Set<string>();
   const sessionDrills: SessionDrill[] = [];
 
+  // ── Basketball section ───────────────────────────────────────────────────
   // Warmup
   WARMUP_IDS.forEach((id) => {
     const d = allDrills.find((x) => x.id === id);
-    if (d && canDo(d, available)) {
+    if (d && canDo(d, bbAvail)) {
       sessionDrills.push({ drill: d, block: 'warmup' as SessionBlock });
       used.add(id);
     }
   });
 
-  // Skill block — up to 3 categories from goals
-  const goalCategories = profile.goals.flatMap((g) => GOAL_CATEGORY_MAP[g]);
-  const uniqueCategories = [...new Set(goalCategories)];
-  const skillCategories = uniqueCategories.slice(0, 3);
+  // Skill block — pick up to 3 goal categories
+  const bbGoals = profile.goals.filter((g) => g !== 'athleticism');
+  const goalCategories = bbGoals.flatMap((g) => GOAL_CATEGORY_MAP[g]);
+  const uniqueCategories = [...new Set(goalCategories)].slice(0, 3);
 
-  for (const cat of skillCategories) {
-    const drills = pickFrom(allDrills, available, cat as DrillCategory, diff, 2, used);
+  for (const cat of uniqueCategories) {
+    const drills = pickFrom(allDrills, bbAvail, cat as DrillCategory, diff, 2, used);
     drills.forEach((d) => {
       sessionDrills.push({ drill: d, block: 'skill' as SessionBlock });
       used.add(d.id);
     });
   }
 
-  // Conditioning or lift block
-  const hasGym = profile.equipmentAccess === 'full-gym' || profile.equipmentAccess === 'home-gym';
-  const wantsAth = profile.goals.includes('athleticism');
-
-  if (hasGym && wantsAth) {
-    const liftDrills = pickFrom(allDrills, available, 'strength', diff, 3, used);
-    liftDrills.forEach((d) => {
-      sessionDrills.push({ drill: d, block: 'lift' as SessionBlock });
-      used.add(d.id);
-    });
-  } else {
-    const condDrills = pickFrom(allDrills, available, 'conditioning', diff, 2, used);
+  // Court-based conditioning (no gym needed)
+  if (profile.goals.includes('conditioning') || profile.goals.includes('athleticism')) {
+    const condDrills = pickFrom(allDrills, bbAvail, 'conditioning', diff, 2, used);
     condDrills.forEach((d) => {
       sessionDrills.push({ drill: d, block: 'conditioning' as SessionBlock });
       used.add(d.id);
@@ -108,10 +132,19 @@ export function generateSession(
   // Cooldown
   COOLDOWN_IDS.forEach((id) => {
     const d = allDrills.find((x) => x.id === id);
-    if (d && canDo(d, available) && !used.has(id)) {
+    if (d && canDo(d, bbAvail) && !used.has(id)) {
       sessionDrills.push({ drill: d, block: 'cooldown' as SessionBlock });
     }
   });
+
+  // ── Gym section ──────────────────────────────────────────────────────────
+  if (gymAvail.length > 0) {
+    const liftDrills = pickFrom(allDrills, gymAvail, 'strength', diff, 4, used);
+    liftDrills.forEach((d) => {
+      sessionDrills.push({ drill: d, block: 'lift' as SessionBlock });
+      used.add(d.id);
+    });
+  }
 
   const estimatedMinutes = Math.min(
     sessionDrills.reduce((sum, sd) => sum + sd.drill.duration, 0),
@@ -134,10 +167,10 @@ export function shortenSession(session: WorkoutSession): WorkoutSession {
     .filter((sd) => sd.block === 'skill')
     .slice(0, Math.max(1, Math.floor(session.drills.filter((x) => x.block === 'skill').length / 2)));
 
-  const newDrills = [...keep, ...skill].sort((a, b) => {
-    const order: SessionBlock[] = ['warmup', 'skill', 'conditioning', 'lift', 'cooldown'];
-    return order.indexOf(a.block) - order.indexOf(b.block);
-  });
+  const blockOrder: SessionBlock[] = ['warmup', 'skill', 'conditioning', 'lift', 'cooldown'];
+  const newDrills = [...keep, ...skill].sort(
+    (a, b) => blockOrder.indexOf(a.block) - blockOrder.indexOf(b.block)
+  );
 
   return {
     ...session,
