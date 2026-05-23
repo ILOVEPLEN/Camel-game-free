@@ -45,7 +45,7 @@ export const DarkColors: ColorSet = {
   surfaceBorder: '#334155',
   textDark: '#F1F5F9',
   textMid: '#94A3B8',
-  textLight: '#475569',
+  textLight: '#64748B',
   white: '#FFFFFF',
   success: '#22C55E',
   warning: '#F59E0B',

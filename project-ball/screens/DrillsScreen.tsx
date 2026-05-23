@@ -184,7 +184,7 @@ const styles = StyleSheet.create({
   },
   diffChipText: { fontSize: 12, fontWeight: '600' },
   count: { fontSize: 13, paddingHorizontal: Spacing.lg, marginBottom: Spacing.sm },
-  list: { paddingHorizontal: Spacing.lg, paddingBottom: Spacing.xxl },
+  list: { paddingHorizontal: Spacing.lg, paddingBottom: 120 },
   emptyState: {
     margin: Spacing.lg,
     borderRadius: Radius.xl,
